@@ -40,11 +40,11 @@ public class FriendsListWindow extends JFrame {
 	private Friend selectedFriend; 
 	private FriendList friendListObj = new FriendList();
 	private LinkedList<JLabel> friendLabel = new LinkedList<JLabel>();
-	private ImageIcon serviceo = new ImageIcon("fb.ico");
 
 	// VALUES
 	private Dimension dimMinWindowSize = new Dimension(200, 250);
 	private boolean imonline = false;
+	private String username;
 
 	// LISTENERS
 	private FocusAdapter evlsearchGray = new FocusAdapter() {
@@ -68,7 +68,7 @@ public class FriendsListWindow extends JFrame {
 	private MouseAdapter evlSignIn = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent me) {
-			modeFriendsList();
+			signin();
 		}
 	};
 	
@@ -150,6 +150,8 @@ public class FriendsListWindow extends JFrame {
 			System.exit(0);
 		}
 	};
+	private final JToolBar tbStatusBar = new JToolBar();
+	private final JLabel lblMessengerStatus = new JLabel("Signed In");
 	
 
 	
@@ -161,9 +163,8 @@ public class FriendsListWindow extends JFrame {
 		setFriendsListComponentHierarchy(); // contains all the panel.add calls for friends list
 		setLoginScreenComponentHierarchy(); // contains all panel.add calls for login screen
 		buildFriendListButtons(); // initiates the friends list array
-		modeFriendsList();
-		
-		//modeLogin();
+		//modeFriendsList();
+		modeLogin();
 	}
 
 	
@@ -239,6 +240,12 @@ public class FriendsListWindow extends JFrame {
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBackground(BCMTheme.colWhite);
+		friendListPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				hideContactRightClickMenu();
+			}
+		});
 
 		friendListPanel.setBackground(BCMTheme.colBG);
 		friendListPanel.setSize(this.getSize());
@@ -271,6 +278,11 @@ public class FriendsListWindow extends JFrame {
 		topPanel.add(cmbStatus);
 		topPanel.add(txtSearch);
 		pnlProg.add(scrollPane, BorderLayout.CENTER);
+		tbStatusBar.setFloatable(false);
+		
+		pnlMainFriends.add(tbStatusBar, BorderLayout.SOUTH);
+		
+		tbStatusBar.add(lblMessengerStatus);
 	}
 	
 	private void addFriend() {
@@ -310,7 +322,6 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	private void wipeFriendListButtons(){
-		//for(JLabel fl: friendLabel){ friendLabel.remove(fl); }
 		friendLabel = new LinkedList<JLabel>();
 		friendListPanel.removeAll();
 	}
@@ -334,10 +345,16 @@ public class FriendsListWindow extends JFrame {
 	
 	//WINDOW MODES
 	private void modeFriendsList() {
-		imonline = true;
 		this.setContentPane(pnlMainFriends);
 		this.repaint();
 		this.setVisible(true);
+	}
+	
+	private void signin() {
+		imonline = true;
+		username = fldUserName.getText();
+		lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
+		modeFriendsList();
 	}
 
 	private void modeLogin() {
@@ -371,7 +388,7 @@ public class FriendsListWindow extends JFrame {
 			currentLabel = friendLabel.get(i);
 			currentFriend = friendListObj.getList().get(i);
 			currentLabel.setText(currentFriend.getNickname());
-			currentLabel.setToolTipText(genTp(currentFriend.getUsername(), currentFriend.getIP()));
+			currentLabel.setToolTipText(BCMTheme.genTp(currentFriend));
 		}
 	}
 
@@ -386,16 +403,16 @@ public class FriendsListWindow extends JFrame {
 			currentFriend = friendListObj.getList().get(i);
 			
 			currentLabel = new JLabel(currentFriend.getNickname());
-			currentLabel.setIcon(serviceo);
-			currentLabel.setIconTextGap(10);
+			currentLabel.setIcon(BCMTheme.contactIcon);
+			currentLabel.setIconTextGap(BCMTheme.icongap);
 			currentLabel.setFocusable(true);
-			currentLabel.setToolTipText(genTp(currentFriend.getUsername(), currentFriend.getIP()));
+			currentLabel.setToolTipText(BCMTheme.genTp(currentFriend));
 			currentLabel.addMouseListener(evlContactClick);
 			currentLabel.setName("f" + i);
-			currentLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			currentLabel.setCursor(BCMTheme.friendCursor);
 			
 			friendLabel.add(currentLabel);
-			friendListPanel.add(Box.createVerticalStrut(5));
+			friendListPanel.add(Box.createVerticalStrut(BCMTheme.strutHeight));
 			friendListPanel.add(currentLabel);
 		}
 
@@ -403,9 +420,7 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	
-	private String genTp(String un, String ip){
-		return (un + " (" + ip + ")");
-	}
+
 	
 	
 }

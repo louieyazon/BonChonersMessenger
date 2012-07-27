@@ -7,7 +7,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.event.*;
 /**
  * 
- * This window accepts a Friend object that has been pre-added to the 
+ * This window accepts a Friend object that has been pre-added to the
+ * Friend List Array in the main chatwindow.
  * 
  * @author John Eric
  *

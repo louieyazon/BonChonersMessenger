@@ -79,7 +79,7 @@ public class ManagerSocket extends Thread{
 					outgoing.println("not available");
 				}	
 			}
-			sleep(1000);
+			sleep(500);
 			
 			System.out.println("Attempting to build 2nd Half");
 			while(true){

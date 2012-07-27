@@ -12,7 +12,10 @@ public class ChatWindow extends JFrame {
 	
 	//VALUES
 		private Friend chatmate;
-		private ChatClient ctc;
+	
+	//CONNECTIONS
+		//private ManagerSocket mgtSocket = new ManagerSocket();
+		
 		
 	//BUZZ FUNCTION VARIABLES
 		short maxbuzzframes = 6;
@@ -23,14 +26,18 @@ public class ChatWindow extends JFrame {
 		
 	//COMPONENTS
 	private JPanel contentPane = new JPanel();
-		private JTextPane txtpneMessageLog = new JTextPane();
-		private JScrollPane pneMessageScrollPane = new JScrollPane(txtpneMessageLog);	
+		private JScrollPane pneMessageScrollPane = new JScrollPane();	
 		private JPanel pnlComposing = new JPanel();
 			private JTextField composeMessageField = new JTextField();
 			private JButton btnSendButton = new JButton("Send");
-			private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pneMessageScrollPane, pnlComposing);
-			private final JButton btnBuzz = new JButton("BUZZ");
+			private final JTextArea textArea = new JTextArea();
+			private final JToolBar toolBar = new JToolBar();
+				private final JButton btnBuzz = new JButton("BUZZ");
+				private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, textArea, pnlComposing);
 			
+	
+	// STUFF FOR THREAD
+	
 		
 
 	//LISTENERS
@@ -56,7 +63,7 @@ public class ChatWindow extends JFrame {
 		this.chatmate = cm;
 		this.setTitle(chatmate.getNickname());
 		
-		ctc = new ChatClient();
+	//	ctc = new ChatClient();
 		
 		//prepare components
 		setComponentProperties();
@@ -79,16 +86,23 @@ public class ChatWindow extends JFrame {
 		
 		//ASSIGN LISTENERS
 		composeMessageField.addKeyListener(evlmsgField);
+		btnBuzz.setMnemonic('B');
+		btnBuzz.setToolTipText("Send a buzz to your friend");
 		btnBuzz.addActionListener(evlBuzzer);
-		pneMessageScrollPane.setColumnHeaderView(btnBuzz);
 		
 		buzztime = new Timer(buzztimerdelay, evlJiggle);
 		buzztime.setRepeats(true);
 		
 	}
 
+	
+	
+	
+	
 	private void sendMessageBoxContents() {
-		ctc.sendMessage(composeMessageField.getText());
+		
+		
+	//	ctc.sendMessage(composeMessageField.getText());
 		composeMessageField.setText("");
 	}
 	
@@ -101,8 +115,13 @@ public class ChatWindow extends JFrame {
 		splitPane.setResizeWeight(1.0);
 		splitPane.setDividerSize(4);
 		
+		
 		pnlComposing.add(composeMessageField, BorderLayout.CENTER);
 		pnlComposing.add(btnSendButton, BorderLayout.EAST);
+		
+		pnlComposing.add(toolBar, BorderLayout.NORTH);
+		
+		toolBar.add(btnBuzz);
 	}
 	
 	
@@ -128,6 +147,8 @@ public class ChatWindow extends JFrame {
 			randJig();
 		}
 	};
+	
+	
 	
 			
 	private void randJig(){

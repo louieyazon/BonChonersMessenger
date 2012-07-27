@@ -44,8 +44,8 @@ public class FriendsListWindow extends JFrame {
 	private String deftxtSearch = "Search...";
 
 	// MAIN FRIENDS LIST
-	private JPanel friendlistPanel = new JPanel();
-	private JScrollPane scrollPane = new JScrollPane(friendlistPanel);
+	private JPanel friendListPanel = new JPanel();
+	private JScrollPane scrollPane = new JScrollPane(friendListPanel);
 	
 	// RIGHT CLICK MENU
 	private final JPopupMenu mnuRightClickContact = new JPopupMenu();
@@ -105,6 +105,10 @@ public class FriendsListWindow extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent me) {
 			
+			
+			int f = Integer.parseInt(me.getComponent().getName().substring(1));
+			selectedFriend = friendListObj.getList().get(f);
+			
 			//RIGHT CLICK
 			if (me.getButton() == MouseEvent.BUTTON3){
 				showContactRightClickMenu();
@@ -113,8 +117,7 @@ public class FriendsListWindow extends JFrame {
 			
 			//LEFT CLICK
 			if ( me.getButton() == MouseEvent.BUTTON1) {
-				int f = Integer.parseInt(me.getComponent().getName().substring(1));
-				selectedFriend = friendListObj.getList().get(f);
+				hideContactRightClickMenu();
 				
 				if (me.getClickCount() == 2) {
 					try {
@@ -150,10 +153,10 @@ public class FriendsListWindow extends JFrame {
 		
 		
 
-		initiateFriendList(); // initiates the friends list array
-		//modeFriendsList();
+		buildFriendListButtons(); // initiates the friends list array
+		modeFriendsList();
 		
-		modeLogin();
+		//modeLogin();
 	}
 
 	private void setWindowProperties() {
@@ -237,15 +240,13 @@ public class FriendsListWindow extends JFrame {
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBackground(BCMTheme.colWhite);
 
-		friendlistPanel.setBackground(BCMTheme.colBG);
-		friendlistPanel.setSize(this.getSize());
-		friendlistPanel.setLayout(new BoxLayout(friendlistPanel, BoxLayout.Y_AXIS));
+		friendListPanel.setBackground(BCMTheme.colBG);
+		friendListPanel.setSize(this.getSize());
+		friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
 		
 		
 		// RIGHT CLICK MENU PROPERTIES
 
-		 
-		 
 		mnContacts.setMnemonic('C');
 		mnHelp.setMnemonic('H');
 		 
@@ -279,8 +280,37 @@ public class FriendsListWindow extends JFrame {
 		
 		
 		pnlProg.add(mnuRightClickContact);
+			mntmrAddContact.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent me) {
+					hideContactRightClickMenu();
+					addFriend();
+				}
+			});
+			
+			
 			mnuRightClickContact.add(mntmrAddContact);
+			
+			
+			
+			mntmrEditContact.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent me) {
+					hideContactRightClickMenu();
+					editFriend();
+				}
+			});
+			
+			
+			
 			mnuRightClickContact.add(mntmrEditContact);
+			mntmrDeleteContact.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					hideContactRightClickMenu();
+					deleteFriend();
+				}
+			});
 			mnuRightClickContact.add(mntmrDeleteContact);
 				
 				
@@ -291,6 +321,45 @@ public class FriendsListWindow extends JFrame {
 		topPanel.add(txtSearch);
 		pnlProg.add(scrollPane, BorderLayout.CENTER);
 	}
+	
+	private void addFriend() {
+		selectedFriend = new Friend("","","");
+		friendListObj.getList().add(selectedFriend);
+		editFriend();
+		if (selectedFriend.isEmpty()) {
+			friendListObj.getList().remove(selectedFriend);
+		}
+		selectedFriend = null;
+	}
+	
+	
+	private void editFriend() {
+		AddFriendDialog ad = new AddFriendDialog(selectedFriend);
+		refreshFriendList();
+	}
+	
+	private void deleteFriend() {
+		friendListObj.getList().remove(selectedFriend);
+		selectedFriend = null;
+		
+		wipeFriendListButtons();
+		System.out.println("friendlist cleared");
+		buildFriendListButtons();
+		System.out.println("buttons rebuilt");
+		this.setVisible(false);
+		this.setVisible(true);
+
+	}
+	
+	
+	private void wipeFriendListButtons(){
+		//for(JLabel fl: friendLabel){ friendLabel.remove(fl); }
+		
+		friendLabel = new LinkedList<JLabel>();
+		friendListPanel.removeAll();
+	}
+	
+	
 	
 	
 	
@@ -311,10 +380,7 @@ public class FriendsListWindow extends JFrame {
 			pnlLoginFields.add(btnLogin);
 	}
 
-	
-	
-	
-	
+
 	private void modeFriendsList() {
 		imonline = true;
 		this.setContentPane(pnlMainFriends);
@@ -338,28 +404,54 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	
+	private void hideContactRightClickMenu() {
+		mnuRightClickContact.setVisible(false);
+	}
 	
-	
-	private void initiateFriendList() {
+
+	private void refreshFriendList() {
 		JLabel currentLabel;
 		Friend currentFriend;
 		
-		for (int i = 0; i < friendListObj.getList().size(); i++) {
-			
-			
+		for (int i = 0; i < friendLabel.size(); i++) {
+			currentLabel = friendLabel.get(i);
 			currentFriend = friendListObj.getList().get(i);
+			currentLabel.setText(currentFriend.getNickname());
+			currentLabel.setToolTipText(genTp(currentFriend.getUsername(), currentFriend.getIP()));
+		}
+	}
+
+	
+	private void buildFriendListButtons() {
+		JLabel currentLabel;
+		Friend currentFriend;
+		
+		// traverse through all friends in friendListObj
+		// generate JLabels for each
+		for (int i = 0; i < friendListObj.getList().size(); i++) {
+			currentFriend = friendListObj.getList().get(i);
+			
 			currentLabel = new JLabel(currentFriend.getNickname());
 			currentLabel.setIcon(serviceo);
 			currentLabel.setIconTextGap(10);
 			currentLabel.setFocusable(true);
-			currentLabel.setToolTipText(currentFriend.getUsername() + currentFriend.getIP());
+			currentLabel.setToolTipText(genTp(currentFriend.getUsername(), currentFriend.getIP()));
 			currentLabel.addMouseListener(evlContactClick);
 			currentLabel.setName("f" + i);
+			currentLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
-			friendlistPanel.add(Box.createVerticalStrut(5));
-			friendlistPanel.add(currentLabel);
-			
+			friendLabel.add(currentLabel);
+			friendListPanel.add(Box.createVerticalStrut(5));
+			friendListPanel.add(currentLabel);
 		}
 
 	}
+	
+	
+	
+	private String genTp(String un, String ip){
+		return (un + " (" + ip + ")");
+	}
+	
+	
 }

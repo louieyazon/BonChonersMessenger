@@ -47,6 +47,12 @@ public class Friend{
 			this.typing = typing;
 		}
 		
+		public boolean isEmpty() {
+			return (   this.ipaddress.trim().equals("")
+					&& this.nickname.trim().equals("")
+					&& this.username.trim().equals(""));
+			
+		}
 		
 		
 		

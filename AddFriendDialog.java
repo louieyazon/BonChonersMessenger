@@ -2,25 +2,22 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.Dialog.ModalityType;
-import javax.swing.BoxLayout;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+/**
+ * 
+ * This window accepts a Friend object that has been pre-added to the 
+ * 
+ * @author John Eric
+ *
+ */
+
 
 
 public class AddFriendDialog extends JDialog {
-
+	private static final long serialVersionUID = 5860039927122697711L;
+	
 	private final JPanel contentPanel = new JPanel();
 	private JTextField tfUserName = new JTextField();
 	private JTextField tfNickname = new JTextField();
@@ -41,14 +38,13 @@ public class AddFriendDialog extends JDialog {
 	JLabel lbliP = new JLabel("IP Address");
 
 	public AddFriendDialog(Friend cF) {
+		
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent k) {
-				
 				if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
 					cancelChanges();
 				}
-				
 			}
 		});
 		
@@ -66,7 +62,6 @@ public class AddFriendDialog extends JDialog {
 			tfNickname.setText(currentFriend.getNickname());
 			tfIPAddress.setText(currentFriend.getIP());
 		} else {
-			currentFriend = new Friend("","","");
 			this.setTitle("New Friend");
 			
 		}

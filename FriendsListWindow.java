@@ -1,12 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
 public class FriendsListWindow extends JFrame {
 
@@ -23,19 +19,6 @@ public class FriendsListWindow extends JFrame {
 	private final JLabel lblPassword = new JLabel("Password");
 	private JPasswordField fldPassword = new JPasswordField();
 	private JButton btnLogin = new JButton("Sign In");
-	
-
-	// MENU BAR
-	private final JMenuBar menuBar = new JMenuBar();
-	private final JMenu mnNewMenu = new JMenu("Messaging");
-		private final JMenuItem mntmMessaging = new JMenuItem("New Chat Window");
-		private final JMenuItem mntmExit = new JMenuItem("Exit");
-	private final JMenu mnContacts = new JMenu("Contacts");
-		private final JMenuItem mntmAddContact = new JMenuItem("Add Contact...");
-		private final JMenuItem mntmEditContact = new JMenuItem("Edit Contact...");
-		private final JMenuItem mntmDeleteContact = new JMenuItem("Delete Contact...");
-	private final JMenu mnHelp = new JMenu("Help");
-		private final JMenuItem mntmAbout = new JMenuItem("About...");
 
 	// TOP PANEL
 	private JPanel topPanel = new JPanel();
@@ -74,6 +57,7 @@ public class FriendsListWindow extends JFrame {
 
 		@Override
 		public void focusLost(FocusEvent fe) {
+			
 			if (txtSearch.getText().equals("")) {
 				txtSearch.setForeground(BCMTheme.colGrayedText);
 				txtSearch.setText(deftxtSearch);
@@ -92,12 +76,39 @@ public class FriendsListWindow extends JFrame {
 	private ItemListener evlSignOut = new ItemListener() {
 		public void itemStateChanged(ItemEvent ie) {
 			if (ie.getStateChange() == ItemEvent.SELECTED && ie.getItem().toString().equalsIgnoreCase("Offline")) {
-				
 				modeLogin();
 			}
 			
 		}
 	};
+	
+	private MouseAdapter evlAddContact = new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent me) {
+			hideContactRightClickMenu();
+			addFriend();
+		}
+	};
+	
+	private MouseAdapter evlEditContact = new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent me) {
+			hideContactRightClickMenu();
+			editFriend();
+		}
+	};
+	
+	private MouseAdapter evlDeleteContact = new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			hideContactRightClickMenu();
+			deleteFriend();
+		}
+	};
+	
+	
+	
+	
 	
 	
 	// Listener for contacts
@@ -147,35 +158,27 @@ public class FriendsListWindow extends JFrame {
 		setWindowProperties();
 		setComponentProperties(); // contains all component modification
 		setLoginComponentProperties();
-		
 		setFriendsListComponentHierarchy(); // contains all the panel.add calls for friends list
 		setLoginScreenComponentHierarchy(); // contains all panel.add calls for login screen
-		
-		
-
 		buildFriendListButtons(); // initiates the friends list array
 		modeFriendsList();
 		
 		//modeLogin();
 	}
 
+	
+	
 	private void setWindowProperties() {
 		// WHOLE WINDOW
 		this.setTitle("BonChonMessenger");
 		this.setBackground(BCMTheme.colBG);
 		this.setMinimumSize(dimMinWindowSize);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(100, 100, 259, 357);
-		
+		this.setBounds(100, 100, 259, 357);	
 	}
-	
-	
-	
-	
 	
 	private void setLoginComponentProperties(){
 		pnlLogin.setLayout(new BoxLayout(pnlLogin, BoxLayout.Y_AXIS));
-
 		pnlLoginFields.setMaximumSize(new Dimension(150, 300));
 		pnlLoginFields.setLayout(new BoxLayout(pnlLoginFields, BoxLayout.Y_AXIS));
 		pnlLoginFields.setAlignmentX(JComponent.CENTER_ALIGNMENT);
@@ -216,7 +219,6 @@ public class FriendsListWindow extends JFrame {
 		// TOP PANEL
 		topPanel.setBorder(new EmptyBorder(3, 3, 3, 3));
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-		mnNewMenu.setMnemonic('M');
 		cmbStatus.addItemListener(evlSignOut);
 
 
@@ -224,8 +226,6 @@ public class FriendsListWindow extends JFrame {
 		cmbStatus.setToolTipText("Set status");
 			cmbStatus.addItem("Available");
 			cmbStatus.addItem("Offline");
-		mntmExit.addActionListener(evlExit);
-		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 
 		
 		// SEARCH BOX
@@ -244,11 +244,10 @@ public class FriendsListWindow extends JFrame {
 		friendListPanel.setSize(this.getSize());
 		friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
 		
-		
-		// RIGHT CLICK MENU PROPERTIES
-
-		mnContacts.setMnemonic('C');
-		mnHelp.setMnemonic('H');
+		// LISTENERS
+		mntmrAddContact.addMouseListener(evlAddContact);
+		mntmrEditContact.addMouseListener(evlEditContact);	
+		mntmrDeleteContact.addMouseListener(evlDeleteContact);	
 		 
 		
 	}
@@ -259,62 +258,14 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	private void setFriendsListComponentHierarchy() {
-		pnlMainFriends.add(menuBar, BorderLayout.NORTH);
-		
-		menuBar.add(mnNewMenu);
-			mntmMessaging.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
-			mnNewMenu.add(mntmMessaging);
-			mnNewMenu.add(new JSeparator());
-			mnNewMenu.add(mntmExit);
-
-		menuBar.add(mnContacts);
-			mnContacts.add(mntmAddContact);
-			mnContacts.add(mntmEditContact);
-			mnContacts.add(mntmDeleteContact);
-			
-		menuBar.add(mnHelp);
-			mnHelp.add(mntmAbout);
 		mnuRightClickContact.setFocusTraversalKeysEnabled(true);
 		mnuRightClickContact.setInheritsPopupMenu(true);
 		
-		
-		
 		pnlProg.add(mnuRightClickContact);
-			mntmrAddContact.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent me) {
-					hideContactRightClickMenu();
-					addFriend();
-				}
-			});
-			
-			
 			mnuRightClickContact.add(mntmrAddContact);
-			
-			
-			
-			mntmrEditContact.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent me) {
-					hideContactRightClickMenu();
-					editFriend();
-				}
-			});
-			
-			
-			
 			mnuRightClickContact.add(mntmrEditContact);
-			mntmrDeleteContact.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					hideContactRightClickMenu();
-					deleteFriend();
-				}
-			});
 			mnuRightClickContact.add(mntmrDeleteContact);
-				
-				
-		
+			
 		pnlMainFriends.add(pnlProg, BorderLayout.CENTER);
 		pnlProg.add(topPanel, BorderLayout.NORTH);
 		topPanel.add(cmbStatus);
@@ -326,44 +277,43 @@ public class FriendsListWindow extends JFrame {
 		selectedFriend = new Friend("","","");
 		friendListObj.getList().add(selectedFriend);
 		editFriend();
-		if (selectedFriend.isEmpty()) {
+		
+		if (selectedFriend.isEmpty() == true) {
 			friendListObj.getList().remove(selectedFriend);
+			selectedFriend = null;
+			System.out.println("friend add canceled");
+		} else {
+			wipeFriendListButtons();
+			buildFriendListButtons();
+			System.out.println("friend added");
+			scrollPane.revalidate();
 		}
-		selectedFriend = null;
 	}
 	
 	
 	private void editFriend() {
-		AddFriendDialog ad = new AddFriendDialog(selectedFriend);
+		new AddFriendDialog(selectedFriend);
 		refreshFriendList();
 	}
 	
 	private void deleteFriend() {
-		friendListObj.getList().remove(selectedFriend);
-		selectedFriend = null;
+		int trulyDelete = JOptionPane.showConfirmDialog(this, "Delete this contact?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION);
 		
-		wipeFriendListButtons();
-		System.out.println("friendlist cleared");
-		buildFriendListButtons();
-		System.out.println("buttons rebuilt");
-		this.setVisible(false);
-		this.setVisible(true);
-
+		if (trulyDelete == JOptionPane.OK_OPTION)
+		{	
+			friendListObj.getList().remove(selectedFriend);
+			selectedFriend = null;
+			wipeFriendListButtons();
+			buildFriendListButtons();
+			scrollPane.revalidate();
+		} 
 	}
-	
 	
 	private void wipeFriendListButtons(){
 		//for(JLabel fl: friendLabel){ friendLabel.remove(fl); }
-		
 		friendLabel = new LinkedList<JLabel>();
 		friendListPanel.removeAll();
 	}
-	
-	
-	
-	
-	
-	
 	
 	private void setLoginScreenComponentHierarchy(){
 		pnlLogin.add(Box.createVerticalGlue());
@@ -380,7 +330,9 @@ public class FriendsListWindow extends JFrame {
 			pnlLoginFields.add(btnLogin);
 	}
 
-
+	
+	
+	//WINDOW MODES
 	private void modeFriendsList() {
 		imonline = true;
 		this.setContentPane(pnlMainFriends);
@@ -395,6 +347,8 @@ public class FriendsListWindow extends JFrame {
 		this.setVisible(true);
 	}
 
+	
+	
 	
 	
 	private void showContactRightClickMenu() {

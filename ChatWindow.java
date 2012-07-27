@@ -1,21 +1,16 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
+import java.awt.*;
 import java.awt.event.*;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 
 
 public class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 958392446358889555L;
-	
 	//VALUES
-		private Friend chatmate;
-	
+	private Friend chatmate;
+
 	//CONNECTIONS
 		//private ManagerSocket mgtSocket = new ManagerSocket();
-		
 		
 	//BUZZ FUNCTION VARIABLES
 		short maxbuzzframes = 6;
@@ -25,36 +20,16 @@ public class ChatWindow extends JFrame {
 		Rectangle boundsholder;
 		
 	//COMPONENTS
-	private JPanel contentPane = new JPanel();
-		private JScrollPane pneMessageScrollPane = new JScrollPane();	
+	private JPanel contentPane = new JPanel();	
 		private JPanel pnlComposing = new JPanel();
 			private JTextField composeMessageField = new JTextField();
 			private JButton btnSendButton = new JButton("Send");
 			private final JTextArea textArea = new JTextArea();
-			private final JToolBar toolBar = new JToolBar();
+			private final JToolBar chatToolBar = new JToolBar();
 				private final JButton btnBuzz = new JButton("BUZZ");
 				private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, textArea, pnlComposing);
-			
 	
-	// STUFF FOR THREAD
 	
-		
-
-	//LISTENERS
-	private KeyAdapter evlmsgField = new KeyAdapter() {
-		@Override
-		public void keyPressed(KeyEvent k) {
-			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-				sendMessageBoxContents();
-			}
-		}
-	};
-	
-	private ActionListener evlBuzzer = new ActionListener() {
-		public void actionPerformed(ActionEvent arg0) {
-			buzzWindow();
-		}
-	};
 	
 	
 	//CONSTRUCTOR
@@ -62,8 +37,6 @@ public class ChatWindow extends JFrame {
 		//prepare window
 		this.chatmate = cm;
 		this.setTitle(chatmate.getNickname());
-		
-	//	ctc = new ChatClient();
 		
 		//prepare components
 		setComponentProperties();
@@ -93,6 +66,8 @@ public class ChatWindow extends JFrame {
 		buzztime = new Timer(buzztimerdelay, evlJiggle);
 		buzztime.setRepeats(true);
 		
+		chatToolBar.setFloatable(false);
+		
 	}
 
 	
@@ -119,9 +94,9 @@ public class ChatWindow extends JFrame {
 		pnlComposing.add(composeMessageField, BorderLayout.CENTER);
 		pnlComposing.add(btnSendButton, BorderLayout.EAST);
 		
-		pnlComposing.add(toolBar, BorderLayout.NORTH);
+		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
 		
-		toolBar.add(btnBuzz);
+		chatToolBar.add(btnBuzz);
 	}
 	
 	
@@ -133,26 +108,21 @@ public class ChatWindow extends JFrame {
 	// BUZZ FUNCTION
 	
 	private void buzzWindow(){
-		System.out.println("BUZZ");
+		//System.out.println("BUZZ");
 		if (buzzframes == 0) {
 			boundsholder = this.getBounds();
 			buzztime.start();
 		}	
 	}
-	
-	
+		
 	// EVL JIGGLE IS REPEATEDLY TRIGGERED
 	private ActionListener evlJiggle = new ActionListener() {
 		public void actionPerformed(ActionEvent ae){
 			randJig();
 		}
 	};
-	
-	
-	
 			
 	private void randJig(){
-		//System.out.println( this.getClass() );
 		int rx = (int)(  (Math.random()-Math.random()) * (  30-(buzzframes*4)  )   ) ;
 		int ry = (int)(  (Math.random()-Math.random()) * (  30-(buzzframes*4)  )   ) ;
 		
@@ -165,6 +135,38 @@ public class ChatWindow extends JFrame {
 			this.setBounds(boundsholder);
 		}
 	}
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	//LISTENERS
+	private KeyAdapter evlmsgField = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent k) {
+			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
+				sendMessageBoxContents();
+			}
+		}
+	};
+	
+	private ActionListener evlBuzzer = new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+			buzzWindow();
+		}
+	};
+	
+	
+	
+
+	
 	
 	
 	

@@ -5,24 +5,22 @@ import java.awt.FlowLayout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.*;
+import java.util.regex.Pattern;
 /**
  * 
  * This window accepts a Friend object that has been pre-added to the
  * Friend List Array in the main chatwindow.
  * 
- * @author John Eric
  *
  */
-
-
 
 public class AddFriendDialog extends JDialog {
 	private static final long serialVersionUID = 5860039927122697711L;
 	
 	private final JPanel contentPanel = new JPanel();
-	private JTextField tfUserName = new JTextField();
-	private JTextField tfNickname = new JTextField();
-	private JTextField tfIPAddress = new JTextField();
+	private FriendDataField tfUserName = new FriendDataField();
+	private FriendDataField tfNickname = new FriendDataField();
+	private FriendDataField tfIPAddress = new FriendDataField();
 	private Friend currentFriend;
 	
 	
@@ -35,6 +33,36 @@ public class AddFriendDialog extends JDialog {
 	JLabel lblNickname = new JLabel("Nickname");
 	JPanel pnlIPadd = new JPanel();
 	JLabel lbliP = new JLabel("IP Address");
+	private final JLabel lblErrorLabel = new JLabel("");
+	
+	
+	private KeyAdapter evlTypingInField = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent k) {
+			
+			
+			FriendDataField currentField = (FriendDataField)k.getSource();
+			
+			if (currentField.getName() == "IPField") {
+				currentField.reflectIPError();
+			} else {
+				currentField.reflectError();
+			}
+			
+			
+			
+			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
+				saveChanges();
+			}
+			
+			if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
+				cancelChanges();
+			}
+			
+			
+		}
+	};
+	
 
 	public AddFriendDialog(Friend cF) {
 		lbliP.setDisplayedMnemonic('I');
@@ -43,6 +71,7 @@ public class AddFriendDialog extends JDialog {
 		lblNickname.setLabelFor(tfNickname);
 		lblUsername.setDisplayedMnemonic('U');
 		lblUsername.setLabelFor(tfUserName);
+		tfIPAddress.setName("IPField");
 		
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -58,7 +87,7 @@ public class AddFriendDialog extends JDialog {
 		setComponentProperties();
 		
 		currentFriend = cF;
-		
+
 		
 		if (!currentFriend.isEmpty()) {
 			
@@ -66,6 +95,8 @@ public class AddFriendDialog extends JDialog {
 			tfUserName.setText(currentFriend.getUsername());
 			tfNickname.setText(currentFriend.getNickname());
 			tfIPAddress.setText(currentFriend.getIP());
+
+			
 		} else {
 			this.setTitle("New Friend");
 			
@@ -78,12 +109,12 @@ public class AddFriendDialog extends JDialog {
 	
 
 	private void setComponentProperties() {
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setBounds(100, 100, 321, 200);
-		getContentPane().setLayout(new BorderLayout());
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setModalityType(ModalityType.APPLICATION_MODAL);
+		this.setBounds(100, 100, 321, 200);
+		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		
 		
@@ -95,51 +126,18 @@ public class AddFriendDialog extends JDialog {
 			contentPanel.add(pnlFriendFields);
 				pnlFriendFields.add(pnlUserName);
 					pnlUserName.add(lblUsername);
-					tfUserName.addKeyListener(new KeyAdapter() {
-						@Override
-						public void keyPressed(KeyEvent k) {
-							if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-								saveChanges();
-							}
-							
-							if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
-								cancelChanges();
-							}
-						}
-					});
+					tfUserName.addKeyListener(evlTypingInField);
 					pnlUserName.add(tfUserName);
 					tfUserName.setColumns(15);
 			
 				pnlFriendFields.add(pnlNickName);
 					pnlNickName.add(lblNickname);
-					tfNickname.addKeyListener(new KeyAdapter() {
-						@Override
-						public void keyPressed(KeyEvent k) {
-							if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-								saveChanges();
-							}
-							
-							if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
-								cancelChanges();
-							}
-						}
-					});
+					tfNickname.addKeyListener(evlTypingInField);
 					pnlNickName.add(tfNickname);
 					tfNickname.setColumns(15);
 				pnlFriendFields.add(pnlIPadd);
 					pnlIPadd.add(lbliP);
-					tfIPAddress.addKeyListener(new KeyAdapter() {
-						@Override
-						public void keyPressed(KeyEvent k) {
-							if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-								saveChanges();
-							}
-							
-							if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
-								cancelChanges();
-							}
-						}
-					});
+					tfIPAddress.addKeyListener(evlTypingInField);
 					pnlIPadd.add(tfIPAddress);
 					tfIPAddress.setColumns(15);
 				
@@ -157,6 +155,8 @@ public class AddFriendDialog extends JDialog {
 						saveChanges();
 					}
 				});
+				
+				buttonPane.add(lblErrorLabel);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
@@ -176,14 +176,69 @@ public class AddFriendDialog extends JDialog {
 	
 	
 	private void saveChanges() {
-		currentFriend.setUsername(tfUserName.getText().trim());
-		currentFriend.setNickname(tfNickname.getText().trim());
-		currentFriend.setIP(tfIPAddress.getText().trim());
-		this.dispose();
+		boolean goodData = checkData();
+		if (goodData) {
+			currentFriend.setUsername(tfUserName.getText().trim());
+			currentFriend.setNickname(tfNickname.getText().trim());
+			currentFriend.setIP(tfIPAddress.getText().trim());
+			this.dispose();
+		}
+		
+	}
+	
+	
+	private boolean checkData() {
+		if (tfUserName.containsDelimiter() ||
+			tfNickname.containsDelimiter() ||
+			!tfIPAddress.goodIP()) {
+			return false;
+		}
+		return true;
 	}
 	
 	private void cancelChanges() {
 		this.dispose();
+	}
+	
+	
+	
+	
+	
+	
+	public class FriendDataField extends JTextField {
+		private static final long serialVersionUID = 1L;
+
+		public boolean containsDelimiter() {				
+				return (this.getText().contains(FriendList.fileDelimiter));
+			}
+		
+		public boolean goodIP() {
+			return Pattern.matches("(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", this.getText().trim());			
+		}
+
+		
+		
+		public void showError () {
+				this.setBackground(BCMTheme.colError);
+				this.repaint();
+			}
+		
+		public void showNoError() {
+				this.setBackground(BCMTheme.colBG);
+				this.repaint();
+		}
+		
+
+		
+		public void reflectError() {
+			if (this.containsDelimiter()) {	showError(); }
+			else { showNoError();}
+		}
+
+		public void reflectIPError() {
+			if (!this.goodIP()) {showError();}
+			else {showNoError();}
+		}
 	}
 
 }

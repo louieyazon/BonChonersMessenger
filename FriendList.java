@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class FriendList {
 	private ArrayList<Friend> friendArray = new ArrayList<Friend>();
 	private File fileFriendslist;
-	private static String fileDelimiter = ";";
-	private static String ipDelimiter = ".";
+	public static String fileDelimiter = ";";
+	public static String ipDelimiter = ".";
 	
 	
 	public ArrayList<Friend> getList(){

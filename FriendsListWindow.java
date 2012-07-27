@@ -29,6 +29,8 @@ public class FriendsListWindow extends JFrame {
 	// MAIN FRIENDS LIST
 	private JPanel friendListPanel = new JPanel();
 	private JScrollPane scrollPane = new JScrollPane(friendListPanel);
+	private final JToolBar tbStatusBar = new JToolBar();
+	private final JLabel lblMessengerStatus = new JLabel("Signed In");
 	
 	// RIGHT CLICK MENU
 	private final JPopupMenu mnuRightClickContact = new JPopupMenu();
@@ -40,10 +42,11 @@ public class FriendsListWindow extends JFrame {
 	private Friend selectedFriend; 
 	private FriendList friendListObj = new FriendList();
 	private LinkedList<JLabel> friendLabel = new LinkedList<JLabel>();
+	private JLabel selectedLabel;
 
 	// VALUES
 	private Dimension dimMinWindowSize = new Dimension(200, 250);
-	private boolean imonline = false;
+	private boolean imOnline = false;
 	private String username;
 
 	// LISTENERS
@@ -116,8 +119,10 @@ public class FriendsListWindow extends JFrame {
 		@Override
 		public void mouseClicked(MouseEvent me) {
 			
-			
-			int f = Integer.parseInt(me.getComponent().getName().substring(1));
+			if (selectedLabel != null) { deselectLabel(selectedLabel); }
+			selectLabel((JLabel) me.getComponent());
+
+			int f = Integer.parseInt(selectedLabel.getName().substring(1));
 			selectedFriend = friendListObj.getList().get(f);
 			
 			//RIGHT CLICK
@@ -125,10 +130,12 @@ public class FriendsListWindow extends JFrame {
 				showContactRightClickMenu();
 			}
 			
-			
 			//LEFT CLICK
 			if ( me.getButton() == MouseEvent.BUTTON1) {
 				hideContactRightClickMenu();
+				
+				
+				
 				
 				if (me.getClickCount() == 2) {
 					try {
@@ -139,19 +146,44 @@ public class FriendsListWindow extends JFrame {
 				}
 			}
 		}
+		
+		
+		public void mouseExited(MouseEvent me) {
+			
+			
+			
+			
+		}
+		
+		
+		
+		
 	};
 	
 	
+	private void deselectLabel(JLabel l) {
+		
+		selectedLabel.setBackground(BCMTheme.colBG);
+		selectedLabel.repaint();
+		
+	}
+	
+	private void deselectLabel() {
+			
+			selectedLabel.setBackground(BCMTheme.colBG);
+			selectedLabel.repaint();
+			
+		}
+	
+	
+	private void selectLabel(JLabel l) {
+		selectedLabel = l;
+		selectedLabel.setBackground(BCMTheme.colLightBlue);
+		selectedLabel.repaint();
+		
+	}
 	
 
-	// Exit Menu Item
-	private ActionListener evlExit = new ActionListener() {
-		public void actionPerformed(ActionEvent arg0) {
-			System.exit(0);
-		}
-	};
-	private final JToolBar tbStatusBar = new JToolBar();
-	private final JLabel lblMessengerStatus = new JLabel("Signed In");
 	
 
 	
@@ -244,6 +276,7 @@ public class FriendsListWindow extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				hideContactRightClickMenu();
+				deselectLabel();
 			}
 		});
 
@@ -267,6 +300,7 @@ public class FriendsListWindow extends JFrame {
 	private void setFriendsListComponentHierarchy() {
 		mnuRightClickContact.setFocusTraversalKeysEnabled(true);
 		mnuRightClickContact.setInheritsPopupMenu(true);
+		
 		
 		pnlProg.add(mnuRightClickContact);
 			mnuRightClickContact.add(mntmrAddContact);
@@ -351,14 +385,14 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	private void signin() {
-		imonline = true;
+		imOnline = true;
 		username = fldUserName.getText();
 		lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
 		modeFriendsList();
 	}
 
 	private void modeLogin() {
-		imonline = false;
+		imOnline = false;
 		this.setContentPane(pnlLogin);
 		this.repaint();
 		this.setVisible(true);
@@ -403,6 +437,9 @@ public class FriendsListWindow extends JFrame {
 			currentFriend = friendListObj.getList().get(i);
 			
 			currentLabel = new JLabel(currentFriend.getNickname());
+			currentLabel.setOpaque(true);
+			
+			currentLabel.setBackground(BCMTheme.colBG);
 			currentLabel.setIcon(BCMTheme.contactIcon);
 			currentLabel.setIconTextGap(BCMTheme.icongap);
 			currentLabel.setFocusable(true);

@@ -79,6 +79,7 @@ public class ChatWindow extends JFrame {
 		
 	//	ctc.sendMessage(composeMessageField.getText());
 		composeMessageField.setText("");
+		composeMessageField.grabFocus();
 	}
 	
 	
@@ -92,6 +93,7 @@ public class ChatWindow extends JFrame {
 		
 		
 		pnlComposing.add(composeMessageField, BorderLayout.CENTER);
+		btnSendButton.addActionListener(evlSendButton);
 		pnlComposing.add(btnSendButton, BorderLayout.EAST);
 		
 		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
@@ -154,14 +156,30 @@ public class ChatWindow extends JFrame {
 			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
 				sendMessageBoxContents();
 			}
+			
+			if (k.getKeyCode() == KeyEvent.VK_B && k.getModifiers() == KeyEvent.VK_CONTROL) {
+				buzzWindow();
+			}
+			
+			
 		}
 	};
+	
+	private ActionListener evlSendButton = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			
+			sendMessageBoxContents();
+		}
+	};
+	
 	
 	private ActionListener evlBuzzer = new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
 			buzzWindow();
 		}
 	};
+	
+	
 	
 	
 	

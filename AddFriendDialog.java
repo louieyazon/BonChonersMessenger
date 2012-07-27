@@ -25,8 +25,6 @@ public class AddFriendDialog extends JDialog {
 	private JTextField tfIPAddress = new JTextField();
 	private Friend currentFriend;
 	
-	boolean emptyFriend;
-	
 	
 	//COMPONENTS
 	JPanel pnlFriendFields = new JPanel();
@@ -39,6 +37,12 @@ public class AddFriendDialog extends JDialog {
 	JLabel lbliP = new JLabel("IP Address");
 
 	public AddFriendDialog(Friend cF) {
+		lbliP.setDisplayedMnemonic('I');
+		lbliP.setLabelFor(tfIPAddress);
+		lblNickname.setDisplayedMnemonic('N');
+		lblNickname.setLabelFor(tfNickname);
+		lblUsername.setDisplayedMnemonic('U');
+		lblUsername.setLabelFor(tfUserName);
 		
 		addKeyListener(new KeyAdapter() {
 			@Override
@@ -145,6 +149,7 @@ public class AddFriendDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
 				JButton okButton = new JButton("OK");
+				okButton.setMnemonic('O');
 
 				okButton.addMouseListener(new MouseAdapter() {
 					@Override
@@ -157,6 +162,7 @@ public class AddFriendDialog extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.setMnemonic('C');
 				cancelButton.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {

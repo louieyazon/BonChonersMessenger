@@ -25,7 +25,7 @@ public class ChatWindow extends JFrame {
 		Timer updatetimer;
 		int updatedelay = 500;
 		
-	//BUZZ FUNCTION VARIABLES
+	// BUZZ FUNCTION VARIABLES
 		short buzzBuffer = 0;
 		short maxbuzzframes = 9;
 		Timer buzztime;
@@ -37,7 +37,7 @@ public class ChatWindow extends JFrame {
 		private double[] baMagnitude = new double[maxbuzzframes];
 		Rectangle boundsholder;
 		
-	//COMPONENTS
+	// COMPONENTS
 	private JPanel contentPane = new JPanel();	
 		private JPanel pnlComposing = new JPanel();
 			private JTextField composeMessageField = new JTextField();

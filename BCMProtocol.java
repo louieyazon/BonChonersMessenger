@@ -1,10 +1,10 @@
 package bcmNetworking;
 
 public class BCMProtocol {
-	//Default port vales
-	public static final int MANAGER_PORT = 3232;
-	public static final int MAX_PORT = 3400;
-	public static final int MIN_PORT = 3301;
+	//Default port values
+	static final int MANAGER_PORT = 3232;
+	static final int MAX_PORT = 55600;
+	static final int MIN_PORT = 55501;
 	
 	//Secret Handshake
 	public static final String HANDSHAKE = "PaulPogi";

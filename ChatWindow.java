@@ -25,10 +25,13 @@ public class ChatWindow extends JFrame {
 		int updatedelay = 500;
 		
 	//BUZZ FUNCTION VARIABLES
-		short maxbuzzframes = 6;
+		short maxbuzzframes = 8;
 		Timer buzztime;
 		short buzzframes;
 		int buzztimerdelay = 30;
+		private int[] bdaX;
+		private int[] bdaY;
+		private double[] baMagnitude = new double[maxbuzzframes];
 		Rectangle boundsholder;
 		
 	//COMPONENTS
@@ -112,6 +115,7 @@ public class ChatWindow extends JFrame {
 		
 		buzztime = new Timer(buzztimerdelay, evlJiggle);
 		buzztime.setRepeats(true);
+		genBuzzMagnitudeArray();
 		
 		
 		
@@ -152,30 +156,50 @@ public class ChatWindow extends JFrame {
 	private void buzzWindow(){
 		//System.out.println("BUZZ");
 		if (buzzframes == 0) {
+			
+			newBuzzArray();
 			boundsholder = this.getBounds();
 			sendMessage("BUZZ!!");
 			buzztime.start();
 		}	
 	}
+
+	private void newBuzzArray() {
+		
+		bdaX = new int[maxbuzzframes];
+		bdaY = new int[maxbuzzframes];
+		
+		for(int r = 0; r < maxbuzzframes; r++) {
+			double direction = Math.random() * 360;
+			bdaX[r] = (int)(Math.cos(direction) * baMagnitude[r]);
+			bdaY[r] = (int)(Math.sin(direction) * baMagnitude[r]);
+		}
+	}
+	
+	private void genBuzzMagnitudeArray() {
+		for(int r = 0; r < maxbuzzframes; r++) {
+			baMagnitude[r] = Math.pow((double)maxbuzzframes + 1,  1.2) / (int)(Math.pow((double)r + 1, 1.2));
+		}
+	}
+	
+	
 		
 	// EVL JIGGLE IS REPEATEDLY TRIGGERED
 	private ActionListener evlJiggle = new ActionListener() {
 		public void actionPerformed(ActionEvent ae){
-			randJig();
+			oscillateWindow();
 		}
 	};
 			
-	private void randJig(){
-		int rx = (int)(  (Math.random()-Math.random()) * (  30-(buzzframes*4)  )   ) ;
-		int ry = (int)(  (Math.random()-Math.random()) * (  30-(buzzframes*4)  )   ) ;
-		
-		this.setBounds(boundsholder.x + rx, boundsholder.y + ry, boundsholder.width, boundsholder.height);
-		
-		buzzframes++;
-		if (buzzframes > maxbuzzframes) {
+	private void oscillateWindow(){
+		if (buzzframes < maxbuzzframes) {
+			this.setBounds(boundsholder.x + bdaX[buzzframes], boundsholder.y + bdaY[buzzframes], boundsholder.width, boundsholder.height);
+			buzzframes++;
+		} else {
 			buzztime.stop();
 			buzzframes = 0;
 			this.setBounds(boundsholder);
+			return;
 		}
 	}
 	
@@ -210,7 +234,6 @@ public class ChatWindow extends JFrame {
 		}
 	};
 	
-	
 	private ActionListener evlBuzzer = new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
 			buzzWindow();
@@ -233,15 +256,12 @@ public class ChatWindow extends JFrame {
 		}
 	}
 	
-	
-
 	// WINDOW CLOSER
 	private WindowAdapter evlCloseWindow = new WindowAdapter() {
 	    public void windowClosing(WindowEvent e) {
 	        timeToClose();
 	    }
 	};
-	
 	
 	private void timeToClose() {
 		ff.cancel(false);

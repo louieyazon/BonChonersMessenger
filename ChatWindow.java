@@ -9,6 +9,10 @@ import java.awt.event.*;
 
 public class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 958392446358889555L;
+	
+	//THREAD TESTER // DEBUG
+	FakeFriend ff;
+	
 	//VALUES
 	private Friend chatmate;
 	private String username;
@@ -34,9 +38,6 @@ public class ChatWindow extends JFrame {
 				private final JButton btnBuzz = new JButton("BUZZ");
 				private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrlpnMsgLogArea, pnlComposing);
 	
-	
-	
-	
 	//CONSTRUCTOR
 	public ChatWindow(Friend cm, String username) {
 		this.username = username;
@@ -52,6 +53,7 @@ public class ChatWindow extends JFrame {
 		this.setVisible(true);	
 		
 		//SET THIS TEXT IF CONNECTION WAS SUCCESSFUL
+		connectToFakeFriend();  //REMOVE ME PLEASE
 		textArea.append("Now chatting with " + chatmate.getNickname() + "\n");
 	}
 
@@ -111,7 +113,7 @@ public class ChatWindow extends JFrame {
 	// replace contents with something that hooks onto the client thread 
 	private void sendMessage(String msg) {
 		//ctc.sendMessage(composeMessageField.getText());
-		textArea.append("<" + username + "> " + msg + "\n");   // dummy send
+		textArea.append("\n<" + username + "> " + msg + "");   // dummy send
 	}
 	
 	
@@ -123,9 +125,6 @@ public class ChatWindow extends JFrame {
 		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
 		chatToolBar.add(btnBuzz);
 	}
-	
-	
-	
 	
 	
 	
@@ -203,6 +202,24 @@ public class ChatWindow extends JFrame {
 		}
 	};
 	
+	
+	
+	
+	//FAKEFRIEND
+	private void connectToFakeFriend() {
+		
+		if (ff == null) {
+			
+				//TO START A NEW SWINGWORKER THREAD
+		        SwingUtilities.invokeLater(new Runnable() {
+		            public void run() {
+		            	ff = new FakeFriend(textArea);
+		            	ff.execute();
+		            }
+		        });
+		       //TO START A NEW THREAD
+		}
+	}
 	
 	
 	

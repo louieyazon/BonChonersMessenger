@@ -1,9 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import java.awt.*;
+import java.util.LinkedList;
 import java.awt.event.*;
 
 
@@ -19,6 +18,11 @@ public class ChatWindow extends JFrame {
 
 	//CONNECTIONS
 		//private ManagerSocket mgtSocket = new ManagerSocket();
+	
+	// MESSAGE LOG UPDATER
+		LinkedList<String> messageBuffer = new LinkedList<String>();
+		Timer updatetimer;
+		int updatedelay = 500;
 		
 	//BUZZ FUNCTION VARIABLES
 		short maxbuzzframes = 6;
@@ -55,6 +59,8 @@ public class ChatWindow extends JFrame {
 		//SET THIS TEXT IF CONNECTION WAS SUCCESSFUL
 		connectToFakeFriend();  //REMOVE ME PLEASE
 		textArea.append("Now chatting with " + chatmate.getNickname() + "\n");
+		
+		updatetimer.start();
 	}
 
 	
@@ -84,6 +90,9 @@ public class ChatWindow extends JFrame {
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
 		
+		//MESSAGE LOG UPDATER TIMER
+		updatetimer = new Timer(updatedelay, evlUpdater);
+		updatetimer.setRepeats(true);
 		
 		//ASSIGN LISTENERS
 		composeMessageField.addKeyListener(evlmsgField);
@@ -96,6 +105,8 @@ public class ChatWindow extends JFrame {
 		
 		buzztime = new Timer(buzztimerdelay, evlJiggle);
 		buzztime.setRepeats(true);
+		
+		
 		
 		composeMessageField.grabFocus();
 	}
@@ -183,14 +194,11 @@ public class ChatWindow extends JFrame {
 			if (k.getKeyCode() == KeyEvent.VK_B && k.getModifiers() == KeyEvent.VK_CONTROL) {
 				buzzWindow();
 			}
-			
-			
 		}
 	};
 	
 	private ActionListener evlSendButton = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			
 			sendMessageBoxContents();
 		}
 	};
@@ -205,15 +213,40 @@ public class ChatWindow extends JFrame {
 	
 	
 	
+	
+	
+	
+	
+	
+	// UPDATER
+	private ActionListener evlUpdater = new ActionListener() {
+		public void actionPerformed(ActionEvent arg0) {
+			updateMessageLog();
+		}
+	};
+	
+	private void updateMessageLog() {
+		while(!messageBuffer.isEmpty())
+		{   textArea.append(messageBuffer.getFirst());
+			messageBuffer.removeFirst();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	//FAKEFRIEND
 	private void connectToFakeFriend() {
-		
 		if (ff == null) {
 			
 				//TO START A NEW SWINGWORKER THREAD
 		        SwingUtilities.invokeLater(new Runnable() {
 		            public void run() {
-		            	ff = new FakeFriend(textArea);
+		            	ff = new FakeFriend(messageBuffer);
 		            	ff.execute();
 		            }
 		        });

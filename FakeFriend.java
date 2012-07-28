@@ -7,7 +7,10 @@ import javax.swing.SwingWorker;
 public class FakeFriend extends SwingWorker<Void, String> {
 
 	private LinkedList<String> mBuff;
+	
+	private LinkedList<String> outgoingmBuff = new LinkedList<String>();
 	private String randCode;
+	
 	
 	public FakeFriend(LinkedList<String> fromOutside) {
 		super();
@@ -15,6 +18,9 @@ public class FakeFriend extends SwingWorker<Void, String> {
 		System.out.println("SwingWorker created");	
 	}
 	
+	synchronized public void sendMsg(String msg) {
+		outgoingmBuff.addLast(msg);
+	}
 	
 	
 	@Override
@@ -27,7 +33,13 @@ public class FakeFriend extends SwingWorker<Void, String> {
 			 	interval = (int)(Math.random() * 1000) + 500;
 			 	randCode = String.valueOf(  (int)(Math.random() * 4)  );
 			 	//randCode = BCMProtocol.MESSAGE_CODE + "";		
-			 			
+			 	
+			 	if(!outgoingmBuff.isEmpty()) {
+			 		randCode = BCMProtocol.MESSAGE_CODE + "";
+			 		publish("you said: " + outgoingmBuff.removeFirst());
+			 	}
+			 	
+			 	
 			 	Thread.sleep(interval);
 				publish(i + " : " + interval + "ms");
 			 	i++;

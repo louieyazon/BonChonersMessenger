@@ -11,7 +11,7 @@ public class ChatWindow extends JFrame {
 	private static final long serialVersionUID = 958392446358889555L;
 	
 	//THREAD TESTER // DEBUG
-	FakeFriend ff;
+	private FakeFriend ff;
 	
 	//VALUES
 	private Friend chatmate;
@@ -21,18 +21,18 @@ public class ChatWindow extends JFrame {
 		//private ManagerSocket mgtSocket = new ManagerSocket();
 	
 	// MESSAGE LOG UPDATER
-		LinkedList<String> messageBuffer = new LinkedList<String>();
-		Timer updatetimer;
-		int updatedelay = 500;
+		private LinkedList<String> messageBuffer = new LinkedList<String>();
+		private Timer updatetimer;
+		private int updatedelay = 500;
 		
 	// BUZZ FUNCTION VARIABLES
-		short buzzBuffer = 0;
-		Timer buzztime;
-		short currentBuzzFrame;
+		private short buzzBuffer = 0;
+		private Timer buzztime;
+		private short currentBuzzFrame;
 		private int[] bdaX;
 		private int[] bdaY;
 		private double[] baMagnitude = new double[BCMTheme.MAX_BUZZ_FRAMES];
-		Rectangle boundsholder;
+		private Rectangle boundsholder;
 		
 	// COMPONENTS
 	private JPanel contentPane = new JPanel();	
@@ -64,7 +64,8 @@ public class ChatWindow extends JFrame {
 		this.setVisible(true);	
 		
 		//SET THIS TEXT IF CONNECTION WAS SUCCESSFUL
-		connectToFakeFriend();  //REMOVE ME PLEASE
+		//TODO : Remove FakeFriend after hooking to real connection
+		connectToFakeFriend();
 		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
 		
 		updatetimer.start();
@@ -130,7 +131,8 @@ public class ChatWindow extends JFrame {
 	// replace contents with something that hooks onto the client thread 
 	private void sendMessage(String msg) {
 		//TODO: Pass data to the thread to send a message
-		messageLogTextArea.append("\n<" + username + "> " + msg + "");   // dummy send
+		//messageLogTextArea.append("\n<" + username + "> " + msg + "");   // dummy send
+		ff.sendMsg(msg);
 	}
 	
 	private void sendIsTyping() {
@@ -277,8 +279,7 @@ public class ChatWindow extends JFrame {
 		
 		while(!messageBuffer.isEmpty())
 		{   
-			currMessage = messageBuffer.getFirst();
-			messageBuffer.removeFirst();
+			currMessage = messageBuffer.removeFirst();   // .removeFirst() returns the removed item from the LinkedList.
 			
 			code = currMessage.charAt(0);
 			

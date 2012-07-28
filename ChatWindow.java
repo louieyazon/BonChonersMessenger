@@ -25,10 +25,10 @@ public class ChatWindow extends JFrame {
 		int updatedelay = 500;
 		
 	//BUZZ FUNCTION VARIABLES
-		short maxbuzzframes = 8;
+		short maxbuzzframes = 9;
 		Timer buzztime;
 		short buzzframes;
-		int buzztimerdelay = 30;
+		int buzztimerdelay = 34;  // 33.333ms per frame is 30fps
 		private int[] bdaX;
 		private int[] bdaY;
 		private double[] baMagnitude = new double[maxbuzzframes];
@@ -67,13 +67,11 @@ public class ChatWindow extends JFrame {
 	}
 
 	
-	
 	private void setComponentProperties() {
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(evlCloseWindow);
 		this.setBounds(100, 100, 450, 300);
 		this.setContentPane(contentPane);
-		
 		
 		splitPane.resetToPreferredSizes();
 		splitPane.setResizeWeight(1.0);
@@ -103,10 +101,7 @@ public class ChatWindow extends JFrame {
 		composeMessageField.addKeyListener(evlmsgField);
 		btnSendButton.addActionListener(evlSendButton);
 
-		
-
-		
-		
+		composeMessageField.grabFocus();
 		
 		//BUZZ FEATURE
 		btnBuzz.setMnemonic('B');
@@ -116,10 +111,6 @@ public class ChatWindow extends JFrame {
 		buzztime = new Timer(buzztimerdelay, evlJiggle);
 		buzztime.setRepeats(true);
 		genBuzzMagnitudeArray();
-		
-		
-		
-		composeMessageField.grabFocus();
 	}
 	
 	
@@ -150,13 +141,9 @@ public class ChatWindow extends JFrame {
 	
 	
 	
-	
 	// BUZZ FUNCTION
-	
 	private void buzzWindow(){
-		//System.out.println("BUZZ");
 		if (buzzframes == 0) {
-			
 			newBuzzArray();
 			boundsholder = this.getBounds();
 			sendMessage("BUZZ!!");
@@ -165,10 +152,8 @@ public class ChatWindow extends JFrame {
 	}
 
 	private void newBuzzArray() {
-		
 		bdaX = new int[maxbuzzframes];
 		bdaY = new int[maxbuzzframes];
-		
 		for(int r = 0; r < maxbuzzframes; r++) {
 			double direction = Math.random() * 360;
 			bdaX[r] = (int)(Math.cos(direction) * baMagnitude[r]);
@@ -182,15 +167,14 @@ public class ChatWindow extends JFrame {
 		}
 	}
 	
-	
-		
 	// EVL JIGGLE IS REPEATEDLY TRIGGERED
 	private ActionListener evlJiggle = new ActionListener() {
 		public void actionPerformed(ActionEvent ae){
 			oscillateWindow();
 		}
 	};
-			
+	
+	// CONSEQUENTLY, OSCILLATEWINDOW IS CALLED SEVERAL TIMES
 	private void oscillateWindow(){
 		if (buzzframes < maxbuzzframes) {
 			this.setBounds(boundsholder.x + bdaX[buzzframes], boundsholder.y + bdaY[buzzframes], boundsholder.width, boundsholder.height);
@@ -205,14 +189,7 @@ public class ChatWindow extends JFrame {
 	
 	
 	
-	
-	
 
-	
-	
-	
-	
-	
 	
 	//LISTENERS
 	private KeyAdapter evlmsgField = new KeyAdapter() {

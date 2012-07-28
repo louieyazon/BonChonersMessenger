@@ -108,85 +108,62 @@ public class FriendsListWindow extends JFrame {
 			deleteFriend();
 		}
 	};
+
 	
-	
-	
-	
-	
-	
-	// Listener for contacts
+	// Listener for clicks on contacts
 	private MouseAdapter evlContactClick = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent me) {
 			
+			// VISUAL FEEDBACK ON CLICKED LABEL
 			if (selectedLabel != null) { deselectLabel(selectedLabel); }
 			selectLabel((JLabel) me.getComponent());
 
+			// REFLECT FRIEND SELECTION
 			int f = Integer.parseInt(selectedLabel.getName().substring(1));
 			selectedFriend = friendListObj.getList().get(f);
 			
-			//RIGHT CLICK
-			if (me.getButton() == MouseEvent.BUTTON3){
+			// IF RIGHT CLICK
+			if (me.getButton() == MouseEvent.BUTTON3) {
 				showContactRightClickMenu();
 			}
 			
-			//LEFT CLICK
+			// IF LEFT CLICK
 			if ( me.getButton() == MouseEvent.BUTTON1) {
 				hideContactRightClickMenu();
 				
-				
-				
-				
+				// DOUBLE CLICK OPENS CHAT WIDOW
 				if (me.getClickCount() == 2) {
-					try {
-						new ChatWindow(selectedFriend);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					try { new ChatWindow(selectedFriend, username); }
+					catch (Exception e) { e.printStackTrace(); }
 				}
+				
 			}
 		}
-		
-		
-		public void mouseExited(MouseEvent me) {
-			
-			
-			
-			
-		}
-		
-		
-		
 		
 	};
 	
 	
-	private void deselectLabel(JLabel l) {
-		
-		selectedLabel.setBackground(BCMTheme.colBG);
-		selectedLabel.repaint();
-		
+	private void deselectLabel() {
+		if (selectedLabel != null ) {
+			deselectLabel(selectedLabel);
+		}
 	}
 	
-	private void deselectLabel() {
-			
-			selectedLabel.setBackground(BCMTheme.colBG);
-			selectedLabel.repaint();
-			
-		}
+	private void deselectLabel(JLabel l) {
+		l.setBackground(BCMTheme.colBG);
+		l.repaint();
+	}
 	
 	
 	private void selectLabel(JLabel l) {
 		selectedLabel = l;
 		selectedLabel.setBackground(BCMTheme.colLightBlue);
 		selectedLabel.repaint();
-		
 	}
 	
 
-	
 
-	
 	// CONSTRUCTOR
 	public FriendsListWindow() {
 		setWindowProperties();
@@ -202,13 +179,13 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	private void setWindowProperties() {
-		// WHOLE WINDOW
 		this.setTitle("BonChonMessenger");
 		this.setBackground(BCMTheme.colBG);
 		this.setMinimumSize(dimMinWindowSize);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(100, 100, 259, 357);	
 	}
+	
 	
 	private void setLoginComponentProperties(){
 		pnlLogin.setLayout(new BoxLayout(pnlLogin, BoxLayout.Y_AXIS));
@@ -223,7 +200,6 @@ public class FriendsListWindow extends JFrame {
 		fldUserName.setText("userad");
 		fldUserName.setColumns(BCMTheme.loginFieldWidth);
 		fldPassword.setColumns(BCMTheme.loginFieldWidth);
-		
 		
 		btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnLogin.addMouseListener(evlSignIn);
@@ -272,6 +248,7 @@ public class FriendsListWindow extends JFrame {
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBackground(BCMTheme.colWhite);
+		friendListPanel.setBorder(new EmptyBorder(3, 7, 0, 0));
 		friendListPanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -381,7 +358,7 @@ public class FriendsListWindow extends JFrame {
 	private void modeFriendsList() {
 		this.setContentPane(pnlMainFriends);
 		this.repaint();
-		this.setVisible(true);
+		this.revalidate();
 	}
 	
 	private void signin() {
@@ -395,7 +372,7 @@ public class FriendsListWindow extends JFrame {
 		imOnline = false;
 		this.setContentPane(pnlLogin);
 		this.repaint();
-		this.setVisible(true);
+		this.revalidate();
 	}
 
 	
@@ -417,7 +394,6 @@ public class FriendsListWindow extends JFrame {
 	private void refreshFriendList() {
 		JLabel currentLabel;
 		Friend currentFriend;
-		
 		for (int i = 0; i < friendLabel.size(); i++) {
 			currentLabel = friendLabel.get(i);
 			currentFriend = friendListObj.getList().get(i);

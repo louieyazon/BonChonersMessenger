@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 
@@ -19,7 +21,9 @@ public class BCMTheme {
 	public static int icongap = 10;
 	
 	public static Cursor friendCursor = new Cursor(Cursor.HAND_CURSOR);
-	public static ImageIcon contactIcon = new ImageIcon("fb.ico");
+	public static ImageIcon contactIcon = new ImageIcon("favatar.png");
+	public static Image chatIcon = Toolkit.getDefaultToolkit().getImage("chatico.png");
+	public static ImageIcon messengerIcon = new ImageIcon("fb.ico");
 	
 	public static int STATUS_SIGNEDIN = 1;
 	

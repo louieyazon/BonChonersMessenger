@@ -46,7 +46,11 @@ public class ChatWindow extends JFrame {
 			private final JScrollPane scrlpnMsgLogArea = new JScrollPane(textArea);
 			private final JToolBar chatToolBar = new JToolBar();
 				private final JButton btnBuzz = new JButton("BUZZ");
-				private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrlpnMsgLogArea, pnlComposing);
+				private final JLabel lblisTypingLabel = new JLabel("");
+				private final Component toolbarSeparator = Box.createHorizontalStrut(20);
+				
+	private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrlpnMsgLogArea, pnlComposing);
+	
 	
 	//CONSTRUCTOR
 	public ChatWindow(Friend cm, String username) {
@@ -140,6 +144,8 @@ public class ChatWindow extends JFrame {
 		pnlComposing.add(btnSendButton, BorderLayout.EAST);
 		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
 		chatToolBar.add(btnBuzz);
+		chatToolBar.add(toolbarSeparator);
+		chatToolBar.add(lblisTypingLabel);
 	}
 	
 	
@@ -241,10 +247,12 @@ public class ChatWindow extends JFrame {
 	
 	private void showIsTyping() {
 		this.setTitle(chatmate.getNickname() + " is typing...");
+		lblisTypingLabel.setText(chatmate.getNickname() + " is typing...");
 	}
 	
 	private void showNotTyping() {
 		this.setTitle(chatmate.getNickname());
+		lblisTypingLabel.setText("");
 	}
 	
 	
@@ -286,6 +294,7 @@ public class ChatWindow extends JFrame {
 	        timeToClose();
 	    }
 	};
+	
 	
 	private void timeToClose() {
 		ff.cancel(false);

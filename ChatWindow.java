@@ -31,6 +31,7 @@ public class ChatWindow extends JFrame {
 		int buzztimerdelay = 34;  // 33.333ms per frame is 30fps
 		private int[] bdaX;
 		private int[] bdaY;
+		private int maxMagnitude = 30;
 		private double[] baMagnitude = new double[maxbuzzframes];
 		Rectangle boundsholder;
 		
@@ -155,7 +156,7 @@ public class ChatWindow extends JFrame {
 		bdaX = new int[maxbuzzframes];
 		bdaY = new int[maxbuzzframes];
 		for(int r = 0; r < maxbuzzframes; r++) {
-			double direction = Math.random() * 360;
+			double direction = (Math.random() * 180) * ((buzzframes % 2) + 1);
 			bdaX[r] = (int)(Math.cos(direction) * baMagnitude[r]);
 			bdaY[r] = (int)(Math.sin(direction) * baMagnitude[r]);
 		}
@@ -163,7 +164,8 @@ public class ChatWindow extends JFrame {
 	
 	private void genBuzzMagnitudeArray() {
 		for(int r = 0; r < maxbuzzframes; r++) {
-			baMagnitude[r] = Math.pow((double)maxbuzzframes + 1,  1.2) / (int)(Math.pow((double)r + 1, 1.2));
+			baMagnitude[r] = maxMagnitude / (int)(Math.pow((double)r + 1, 1.2));
+			//System.out.printf("%1.1f  ", baMagnitude[r]);		//DEBUG display Magnitude array
 		}
 	}
 	

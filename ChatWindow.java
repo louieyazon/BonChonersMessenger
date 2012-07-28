@@ -281,6 +281,7 @@ public class ChatWindow extends JFrame {
 			}
 			else if (code == BCMProtocol.BUZZ_CODE) {
 				buzzBuffer++;
+				showNotTyping();
 			}
 			
 			

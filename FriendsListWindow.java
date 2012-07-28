@@ -236,7 +236,7 @@ public class FriendsListWindow extends JFrame {
 		cmbStatus.setToolTipText("Set status");
 			cmbStatus.addItem("Available");
 			cmbStatus.addItem("Offline");
-
+		// TODO What's wrong with these items? Also, fix combo box functionality
 		
 		// SEARCH BOX
 		txtSearch.setForeground(BCMTheme.colGrayedText);
@@ -324,8 +324,7 @@ public class FriendsListWindow extends JFrame {
 		int trulyDelete = JOptionPane.showConfirmDialog(this, "Delete this contact?", "Confirm Delete", JOptionPane.OK_CANCEL_OPTION);
 		
 		if (trulyDelete == JOptionPane.OK_OPTION)
-		{	
-			friendListObj.getList().remove(selectedFriend);
+		{	friendListObj.getList().remove(selectedFriend);
 			selectedFriend = null;
 			wipeFriendListButtons();
 			buildFriendListButtons();
@@ -417,13 +416,13 @@ public class FriendsListWindow extends JFrame {
 			currentLabel.setOpaque(true);
 			
 			currentLabel.setBackground(BCMTheme.colBG);
-			currentLabel.setIcon(BCMTheme.contactIcon);
+			currentLabel.setIcon(BCMTheme.CONTACT_ICON);
 			currentLabel.setIconTextGap(BCMTheme.icongap);
 			currentLabel.setFocusable(true);
 			currentLabel.setToolTipText(BCMTheme.genTp(currentFriend));
 			currentLabel.addMouseListener(evlContactClick);
 			currentLabel.setName("f" + i);
-			currentLabel.setCursor(BCMTheme.friendCursor);
+			currentLabel.setCursor(BCMTheme.FRIEND_CURSOR);
 			
 			friendLabel.add(currentLabel);
 			friendListPanel.add(Box.createVerticalStrut(BCMTheme.strutHeight));

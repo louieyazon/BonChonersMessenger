@@ -66,5 +66,9 @@ public class FriendList {
 		   }
 
 	   }
+	   
+	   
+	   
+	   //TODO save FriendList to file functions
 	
 }

@@ -20,10 +20,10 @@ public class FakeFriend extends SwingWorker<Void, String> {
 		int i = 0;
 		int interval;
 		System.out.println("doInBackground called");
-		 while (!isCancelled()) {  // so the thread loops but can be stopped
+		 while (!isCancelled()) {  // so the thread loops but can be stopped by the outside thread
 			 	interval = (int)(Math.random() * 1000) + 500;
 			 	Thread.sleep(interval);
-				publish(i + " : " + interval);
+				publish(i + " : " + interval + "ms");
 			 	i++;
 		    }
 		return null;
@@ -34,7 +34,7 @@ public class FakeFriend extends SwingWorker<Void, String> {
 	  @Override
 	  protected void process(List<String> chunks){
 	    for(String message : chunks){
-	      System.out.println(message + "process called");
+	      System.out.println(message + " process called");
 	      mBuff.addLast("\n<FakeFriend> " + message + "");
 	    }
 	  }

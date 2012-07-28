@@ -66,9 +66,11 @@ public class ChatWindow extends JFrame {
 	
 	
 	private void setComponentProperties() {
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(evlCloseWindow);
 		this.setBounds(100, 100, 450, 300);
 		this.setContentPane(contentPane);
+		
 		
 		splitPane.resetToPreferredSizes();
 		splitPane.setResizeWeight(1.0);
@@ -97,6 +99,11 @@ public class ChatWindow extends JFrame {
 		//ASSIGN LISTENERS
 		composeMessageField.addKeyListener(evlmsgField);
 		btnSendButton.addActionListener(evlSendButton);
+
+		
+
+		
+		
 		
 		//BUZZ FEATURE
 		btnBuzz.setMnemonic('B');
@@ -212,12 +219,6 @@ public class ChatWindow extends JFrame {
 	
 	
 	
-	
-	
-	
-	
-	
-	
 	// UPDATER
 	private ActionListener evlUpdater = new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
@@ -233,16 +234,25 @@ public class ChatWindow extends JFrame {
 	}
 	
 	
+
+	// WINDOW CLOSER
+	private WindowAdapter evlCloseWindow = new WindowAdapter() {
+	    public void windowClosing(WindowEvent e) {
+	        timeToClose();
+	    }
+	};
 	
 	
-	
+	private void timeToClose() {
+		ff.cancel(false);
+    	this.dispose();
+	}
 	
 	
 	
 	//FAKEFRIEND
 	private void connectToFakeFriend() {
 		if (ff == null) {
-			
 				//TO START A NEW SWINGWORKER THREAD
 		        SwingUtilities.invokeLater(new Runnable() {
 		            public void run() {
@@ -253,12 +263,6 @@ public class ChatWindow extends JFrame {
 		       //TO START A NEW THREAD
 		}
 	}
-	
-	
-	
-	
-	
-
 	
 	
 	

@@ -1,3 +1,4 @@
+package bcmNetworking;
 public class Friend{
 		private String username;
 		private String nickname;

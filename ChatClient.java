@@ -1,3 +1,4 @@
+package bcmNetworking;
 
 public class ChatClient {
 

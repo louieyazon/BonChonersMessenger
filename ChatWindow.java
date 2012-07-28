@@ -1,3 +1,4 @@
+package bcmNetworking;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -25,6 +26,7 @@ public class ChatWindow extends JFrame {
 		int updatedelay = 500;
 		
 	//BUZZ FUNCTION VARIABLES
+		short buzzBuffer = 0;
 		short maxbuzzframes = 9;
 		Timer buzztime;
 		short buzzframes;
@@ -147,8 +149,8 @@ public class ChatWindow extends JFrame {
 		if (buzzframes == 0) {
 			newBuzzArray();
 			boundsholder = this.getBounds();
-			sendMessage("BUZZ!!");
 			buzztime.start();
+			textArea.append("\n BUZZ!!");
 		}	
 	}
 
@@ -183,6 +185,7 @@ public class ChatWindow extends JFrame {
 			buzzframes++;
 		} else {
 			buzztime.stop();
+			buzzBuffer--;
 			buzzframes = 0;
 			this.setBounds(boundsholder);
 			return;
@@ -215,7 +218,12 @@ public class ChatWindow extends JFrame {
 	
 	private ActionListener evlBuzzer = new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
-			buzzWindow();
+			if (buzzframes == 0) { 
+				buzzBuffer++;
+				sendMessage("BUZZ!!");
+				buzzWindow();
+			}
+			
 		}
 	};
 	
@@ -224,14 +232,51 @@ public class ChatWindow extends JFrame {
 	// UPDATER
 	private ActionListener evlUpdater = new ActionListener() {
 		public void actionPerformed(ActionEvent arg0) {
-			updateMessageLog();
+			if(buzzBuffer > 0) { buzzWindow(); }
+			parseIncomingMessage();
 		}
 	};
 	
-	private void updateMessageLog() {
+	
+	
+	private void showIsTyping() {
+		this.setTitle(chatmate.getNickname() + " is typing...");
+	}
+	
+	private void showNotTyping() {
+		this.setTitle(chatmate.getNickname());
+	}
+	
+	
+	private void parseIncomingMessage() {
+		
+		char code;
+		String currMessage;
+		
 		while(!messageBuffer.isEmpty())
-		{   textArea.append(messageBuffer.getFirst());
+		{   
+			currMessage = messageBuffer.getFirst();
 			messageBuffer.removeFirst();
+			
+			code = currMessage.charAt(0);
+			
+			if(code == BCMProtocol.MESSAGE_CODE) {
+				textArea.append("\n" + currMessage.substring(1));
+				showNotTyping();
+			}
+			else if (code == BCMProtocol.CLOSED_CODE) {
+				textArea.append("\n" + chatmate.getNickname() + " has gone offline.");
+				showNotTyping();
+			}
+			else if (code == BCMProtocol.ISTYPING_CODE) {
+				showIsTyping();
+			}
+			else if (code == BCMProtocol.BUZZ_CODE) {
+				buzzBuffer++;
+			}
+			
+			
+			
 		}
 	}
 	

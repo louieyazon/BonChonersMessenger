@@ -5,6 +5,12 @@ import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+
+import bcmBackend.Friend;
+import bcmBackend.FriendList;
+import bcmNetworking.ManagerSocket;
+import bcmNetworking.RequestSocket;
+
 public class FriendsListWindow extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -49,6 +55,10 @@ public class FriendsListWindow extends JFrame {
 	private Dimension dimMinWindowSize = new Dimension(200, 250);
 	private boolean imOnline = false;
 	private String username;
+	
+	//NETWORKING
+	private ManagerSocket managerSocket;
+	
 
 	// LISTENERS
 	private FocusAdapter evlsearchGray = new FocusAdapter() {
@@ -205,6 +215,7 @@ public class FriendsListWindow extends JFrame {
 		buildFriendListButtons(); // initiates the friends list array
 		//modeFriendsList();
 		modeLogin();
+		managerSocket = new ManagerSocket(friendListObj, username);
 	}
 
 	
@@ -460,7 +471,10 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	
-	
+	public static void main(String[] args){
+		FriendsListWindow mainWindow = new FriendsListWindow();
+		mainWindow.setVisible(true);
+	}
 
 	
 	

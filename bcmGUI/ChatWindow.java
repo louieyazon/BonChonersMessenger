@@ -79,9 +79,10 @@ public class ChatWindow extends JFrame {
 	private ReceiveSocketSW receiveSocket;
 	private SendSocketSW sendSocket;
 	private Bridge bridge;
+	private Informable informable;
 	
 	//CONSTRUCTOR
-	public ChatWindow(Friend cm, String username, ReceiveSocketSW receiveSocket, SendSocketSW sendSocket, Bridge bridge) {
+	public ChatWindow(Friend cm, String username, Bridge bridge) {
 		this.username = username;
 		
 		//prepare window
@@ -95,25 +96,33 @@ public class ChatWindow extends JFrame {
 		this.setVisible(true);	
 		
 		//networking setup
-		Informable informable = new Informable(){
+		informable = new Informable(){
 			@Override
 			public void messageReceived(String message){
 				parseIncomingMessage(message);
 				
 			}
 		};
-		this.receiveSocket = receiveSocket;
-		this.sendSocket = sendSocket;
+		
 		this.bridge = bridge;
-		receiveSocket.setInformable(informable);
+		
 		
 		//SET THIS TEXT IF CONNECTION WAS SUCCESSFUL
 		//TODO : Remove FakeFriend after hooking to real connection
 		//connectToFakeFriend();
 		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
 		
-		//updatetimer.start();
+		
 	}
+	public ChatWindow(Friend cm, String username, ReceiveSocketSW receiveSocket, SendSocketSW sendSocket, Bridge bridge) {
+		this(cm, username, bridge);
+		this.sendSocket = sendSocket;
+		this.receiveSocket = receiveSocket;
+		this.receiveSocket.setInformable(informable);
+		enableChat();
+	}
+	
+	
 
 	
 	private void setComponentProperties() {
@@ -142,10 +151,10 @@ public class ChatWindow extends JFrame {
 		messageLogTextArea.setWrapStyleWord(true);
 		messageLogTextArea.setLineWrap(true);
 		
-		/*
+		
 		//MESSAGE LOG UPDATER TIMER
 		updatetimer = new Timer(updatedelay, evlUpdater);
-		updatetimer.setRepeats(true);*/
+		updatetimer.setRepeats(true);
 		
 		//ASSIGN LISTENERS
 		composeMessageField.addKeyListener(evlmsgField);
@@ -161,6 +170,14 @@ public class ChatWindow extends JFrame {
 		buzztime = new Timer(BCMTheme.BUZZ_TIMER_DELAY, evlJiggle);
 		buzztime.setRepeats(true);
 		genBuzzMagnitudeArray();
+		
+		//DISABLE BY DEFAULT
+		composeMessageField.setEnabled(false);
+		messageLogTextArea.setEnabled(false);
+		btnBuzz.setEnabled(false);
+		btnSendButton.setEnabled(false);
+		this.setTitle("Attempting to connect to " + chatmate.getNickname());
+		lblisTypingLabel.setText("Attempting to connect to " + chatmate.getNickname());
 	}
 	
 	
@@ -300,6 +317,12 @@ public class ChatWindow extends JFrame {
 		}
 	};
 	
+	private ActionListener evlUpdater = new ActionListener(){
+		public void actionPerformed(ActionEvent arg0){
+			showNotTyping();
+		}
+	};
+	
 	private void showIsTyping() {
 		this.setTitle(chatmate.getNickname() + " is typing...");
 		lblisTypingLabel.setText(chatmate.getNickname() + " is typing...");
@@ -347,20 +370,32 @@ public class ChatWindow extends JFrame {
 	private void timeToClose() {
 		//ff.cancel(false);
 		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
-		receiveSocket.cancel(false);
-		sendSocket.cancel(false);
+		if(receiveSocket!=null)
+			receiveSocket.cancel(false);
+		if(sendSocket!=null)
+			sendSocket.cancel(false);
     	this.dispose();
 	}
 	
 	
 	public void setReceiveSocket (ReceiveSocketSW receiveSocket){
 		this.receiveSocket = receiveSocket;
+		this.receiveSocket.setInformable(informable);
 	}
 	
 	public void setSendSocket (SendSocketSW sendSocket){
 		this.sendSocket = sendSocket;
 	}
 	
+	public void enableChat (){
+		composeMessageField.setEnabled(true);
+		messageLogTextArea.setEnabled(true);
+		btnBuzz.setEnabled(true);
+		btnSendButton.setEnabled(true);
+		this.setTitle("");
+		lblisTypingLabel.setText("");
+		updatetimer.start();
+	}
 	
 	//FAKEFRIEND
 	/*private void connectToFakeFriend() {

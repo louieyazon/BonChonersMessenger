@@ -31,18 +31,21 @@ public class RequestSocket extends Thread {
 		PrintWriter outgoing;
 		String messageIn;
 		int proposedPort;
-		ReceiveSocketSW rs;
-		SendSocketSW ss;
+		ReceiveSocketSW rs = null;
+		SendSocketSW ss = null;
 		Bridge bridge = new Bridge();
+		ChatWindow cw = null;
 		
 		if(selectedFriend == null)
 			System.out.println("SelectedFriend = null");
-		
+		cw = new ChatWindow(selectedFriend, username, bridge);
 		try{
 			//JOptionPane.showMessageDialog(null, "Connection Attempting. Please wait.");
 			try{
 			connection = new Socket(selectedFriend.getIP(), BCMProtocol.MANAGER_PORT);
 			} catch (Exception ce) {
+				System.out.println(ce.toString());
+				cw.dispose();
 				JOptionPane.showMessageDialog(null, "Could not Connect.");
 				return;
 			}
@@ -127,9 +130,10 @@ public class RequestSocket extends Thread {
 					}
 				
 			}
-			ChatWindow cw = new ChatWindow(selectedFriend, username, rs, ss, bridge);
-				
-
+			
+		cw.setReceiveSocket(rs);
+		cw.setSendSocket(ss);
+		cw.enableChat();
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
 		}

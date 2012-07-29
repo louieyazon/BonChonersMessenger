@@ -63,6 +63,10 @@ public class RequestSocket extends Thread {
 			}
 		//	System.out.println("Handshake Successful. Now Connected.");
 			
+			outgoing.println(connection.getLocalAddress());//Inform the Manager that connection building is complete
+			messageIn = incoming.readLine(); //receive confirmation from Manager
+			if(messageIn.equalsIgnoreCase("disallowed"))
+				return;
 			//Propose & Build the first connection -> Manager:Receiver::Requester:Sender
 			proposedPort = proposePort();
 			

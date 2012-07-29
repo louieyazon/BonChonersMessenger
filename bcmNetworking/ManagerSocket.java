@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import bcmBackend.Friend;
 import bcmBackend.FriendList;
@@ -17,8 +18,9 @@ public class ManagerSocket extends Thread{
 	private FriendList friendList;
 	private String username;
 	private boolean stopped;
+	private LinkedList<String> connectedIPs;
 	
-	public ManagerSocket(FriendList friendList, String username){
+	public ManagerSocket(FriendList friendList, String username, LinkedList<String> connectedIPs){
 		this.friendList = friendList;
 		this.username = username;
 		this.start();
@@ -66,6 +68,13 @@ public class ManagerSocket extends Thread{
 				}
 				//System.out.println("Handshake succesful. Now connected.");
 				
+				messageIn = incoming.readLine();
+				for(String connectedIP : connectedIPs){
+					if(connectedIP.equalsIgnoreCase(messageIn))
+						outgoing.println("disallowed");
+						throw new Exception("IP attempting double connection.");
+				}
+				outgoing.println("approved");
 				/*
 				 *Receive the proposed port from the RequestSocket 
 				 *Check if it is available, and if so, create the

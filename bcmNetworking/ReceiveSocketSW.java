@@ -16,7 +16,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 	//Information passed to the Socket to facilitate creation
 	private int curPort;
 	private Informable informable;
-	
+	private boolean endNow = false;
 	public ReceiveSocketSW(int curPort){
 		this.curPort = curPort;
 		this.execute();
@@ -64,12 +64,14 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 		
 			//Continuously read lines from the input stream
 		try{
-			while(!isCancelled()) {
-			
+			while(!endNow) {
+				
 				messageIn = incoming.readLine();
 				
 				if(messageIn.length() > 0) {
 					System.out.println(messageIn);
+					if(endNow)
+						return 0;
 					publish(messageIn);
 					
 					/*if(messageIn.charAt(0) == CLOSED_CODE) {
@@ -86,8 +88,6 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 			
 		} catch (Exception e) {
 			System.out.println("Sorry, an error has occured. Connection lost.");
-			publish(BCMProtocol.CLOSED_CODE+"");
-			//System.exit(1);
 			return -1;
 		}
 		return 0;
@@ -102,6 +102,10 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 		for(String message : chunks){
 			informable.messageReceived(message);
 		}
+	}
+	
+	public void end(){
+		this.endNow = true;
 	}
 	
 }

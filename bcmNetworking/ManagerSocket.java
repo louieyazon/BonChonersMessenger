@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import bcmBackend.Friend;
 import bcmBackend.FriendList;
@@ -12,7 +13,7 @@ import bcmGUI.ChatWindow;
 
 public class ManagerSocket extends Thread{
 	//Default port vales
-	private String takenPorts = "";
+	private ArrayList<Integer> takenPorts;
 	private FriendList friendList;
 	private String username;
 	
@@ -177,9 +178,9 @@ public class ManagerSocket extends Thread{
 		return false;
 	}
 	
-	public String getTakenPorts(){
+	/*public String getTakenPorts(){
 		return this.takenPorts;
-	}
+	}*/
 	
 	public Friend getRequestingFriend(String reqIP){
 		Friend toReturn = friendList.searchFriends(reqIP);

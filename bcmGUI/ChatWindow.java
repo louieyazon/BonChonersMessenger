@@ -233,11 +233,12 @@ public class ChatWindow extends JFrame {
 	// BUZZ FUNCTION
 	private void buzzWindow(){
 		if (currentBuzzFrame == 0) {
-			new bcmPlaySound("Greetings.wav").run();
+			
 			newBuzzArray();
 			boundsholder = this.getBounds();
 			buzztime.start();
 			messageLogTextArea.append("\n BUZZ!!");
+			new bcmPlaySound("Greetings.wav").run();
 		}	
 	}
 
@@ -370,10 +371,8 @@ public class ChatWindow extends JFrame {
 	private void timeToClose() {
 		//ff.cancel(false);
 		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
-		if(receiveSocket!=null)
-			receiveSocket.cancel(false);
-		if(sendSocket!=null)
-			sendSocket.cancel(false);
+		receiveSocket.end();
+		sendSocket.end();
     	this.dispose();
 	}
 	

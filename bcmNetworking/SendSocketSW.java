@@ -18,6 +18,7 @@ public class SendSocketSW extends SwingWorker {
 	private int curPort;
 	private ChatWindow chatWindow;
 	private Bridge bridge;
+	private boolean endNow;
 	
 	public SendSocketSW(String ipAdd, int curPort, Bridge bridge){
 		this.ipAdd = ipAdd;
@@ -50,16 +51,24 @@ public class SendSocketSW extends SwingWorker {
 			System.out.println("Connected.");
 			
 			
-			while(!isCancelled()) {
+			while(!endNow) {
+				
 				//System.out.print("> ");
 				messageTyped = bridge.getMessage();
 				
 				outgoing.println(messageTyped);
+				if(messageTyped.charAt(0) == BCMProtocol.CLOSED_CODE)
+					return null;
+				
 			}
 
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
 		}
 		return null;
+	}
+	
+	public void end(){
+		this.endNow = true;
 	}
 }

@@ -80,35 +80,34 @@ public class FriendList {
 
 	   }
 	   
-	   
-	   //TODO save FriendList to file functions
-	    public void saveFile(String filename) throws FileNotFoundException, IOException {
-	    	setSaveFile(filename);
-	    	String stringToSave = FriendArrayToExportString();
-	    	Writer dictSaver = new BufferedWriter(new FileWriter(this.fileFriendslist));
+	
+	   public void saveFile(String filename) throws FileNotFoundException, IOException {
+		   setSaveFile(filename);
+		   String stringToSave = FriendArrayToExportString();
+		   Writer fileSaver = new BufferedWriter(new FileWriter(this.fileFriendslist));
 
-	    	try {
-	    		dictSaver.write(stringToSave.toString());
-	    	} finally {
-	    		dictSaver.close();
-	    	}
+		   try {
+			   fileSaver.write(stringToSave.toString());
+		   } finally {
+			   fileSaver.close();
+		   }
 
-	    }
-	    
-	    
-	    private void setSaveFile(String filename) throws IOException{
-	 	   if (this.fileFriendslist == null) {
-	 		   this.fileFriendslist = new File(filename);
-	 	   } else if (fileFriendslist.getName().compareToIgnoreCase(filename) != 0) {
-	 		   this.fileFriendslist = new File(filename);
-	 	   }
+	   }
 
-	 	   if (!this.fileFriendslist.exists()) {
-	 		  fileFriendslist.createNewFile();
-	 	   } else if (!fileFriendslist.canWrite()) {
-	 		   throw new IllegalArgumentException("File cannot be written:" + this.fileFriendslist);
-	 	   }
-	    }
+
+	   private void setSaveFile(String filename) throws IOException{
+		   if (this.fileFriendslist == null) {
+			   this.fileFriendslist = new File(filename);
+		   } else if (fileFriendslist.getName().compareToIgnoreCase(filename) != 0) {
+			   this.fileFriendslist = new File(filename);
+		   }
+
+		   if (!this.fileFriendslist.exists()) {
+			   fileFriendslist.createNewFile();
+		   } else if (!fileFriendslist.canWrite()) {
+			   throw new IllegalArgumentException("File cannot be written:" + this.fileFriendslist);
+		   }
+	   }
 	    
 	    
 	   private String FriendArrayToExportString() {

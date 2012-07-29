@@ -1,185 +1,67 @@
 package bcmGUI;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.LinkedList;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import bcmBackend.Friend;
-import bcmBackend.Informable;
-import bcmBackend.bcmPlaySound;
-import bcmNetworking.BCMProtocol;
-import bcmNetworking.Bridge;
-import bcmNetworking.ReceiveSocketSW;
-import bcmNetworking.SendSocketSW;
+import bcmBackend.*;
+import bcmNetworking.*;
 
 public class ChatWindow extends JFrame {
-	private static final long serialVersionUID = 958392446358889555L;
-	
-	//THREAD TESTER // DEBUG
-	//private FakeFriend ff;
-	
-	//VALUES
-	private Friend chatmate;
-	private String username;
 
-	//CONNECTIONS
-		//private ManagerSocket mgtSocket = new ManagerSocket();
-	
-	// MESSAGE LOG UPDATER
-		private LinkedList<String> messageBuffer = new LinkedList<String>();
-		private Timer updatetimer;
-		private int updatedelay = 3000;
-		
-	// BUZZ FUNCTION VARIABLES
-		private short buzzBuffer = 0;
-		private Timer buzztime;
-		private short currentBuzzFrame;
-		private int[] bdaX;
-		private int[] bdaY;
-		private double[] baMagnitude = new double[BCMTheme.MAX_BUZZ_FRAMES];
-		private Rectangle boundsholder;
-		
-	// COMPONENTS
-	private JPanel contentPane = new JPanel();	
-		private JPanel pnlComposing = new JPanel();
-			private JTextField composeMessageField = new JTextField();
-			private JButton btnSendButton = new JButton("Send");
-			private final JTextArea messageLogTextArea = new JTextArea();
-			private final JScrollPane scrlpnMsgLogArea = new JScrollPane(messageLogTextArea);
-			private final JToolBar chatToolBar = new JToolBar();
-				private final JButton btnBuzz = new JButton("BUZZ");
-				private final JLabel lblisTypingLabel = new JLabel("");
-				private final Component toolbarSeparator = Box.createHorizontalStrut(20);
-				
-	private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrlpnMsgLogArea, pnlComposing);
-	
-	//NETWORKING
-	private ReceiveSocketSW receiveSocket;
-	private SendSocketSW sendSocket;
-	private Bridge bridge;
-	private Informable informable;
-	
-	//CONSTRUCTOR
-	public ChatWindow(Friend cm, String username, Bridge bridge) {
-		this.username = username;
-		
-		//prepare window
+	public ChatWindow(Friend cm, String uname, Bridge br, IPList cip) {
+		this.username = uname;
 		this.chatmate = cm;
-		this.setIconImage(BCMTheme.CHAT_ICON);
+		this.connectedIPs = cip;
+		this.setIconImage(BCMTheme.CHAT_ICON);		//prepare window
 		this.setTitle(chatmate.getNickname());
+		messageLogTextArea.append(BCMTheme.attemptingConnectMessage(chatmate) + "\n");
 		
-		//prepare components
 		setComponentProperties();
 		setComponentHierarchy();
-		this.setVisible(true);	
+		loadingIndicator.setVisible(true);
+		this.setVisible(true);
 		
-		//networking setup
-		informable = new Informable(){
-			@Override
-			public void messageReceived(String message){
-				parseIncomingMessage(message);
-				
-			}
-		};
-		
-		this.bridge = bridge;
-		
-		
-		//SET THIS TEXT IF CONNECTION WAS SUCCESSFUL
-		//TODO : Remove FakeFriend after hooking to real connection
-		//connectToFakeFriend();
-		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
-		
-		
+		msgUpdater = newMessageUpdater();			// initiate networking 
+		this.bridge = br;
 	}
-	public ChatWindow(Friend cm, String username, ReceiveSocketSW receiveSocket, SendSocketSW sendSocket, Bridge bridge) {
-		this(cm, username, bridge);
-		this.sendSocket = sendSocket;
-		this.receiveSocket = receiveSocket;
-		this.receiveSocket.setInformable(informable);
+	
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public ChatWindow(Friend cm, String un, ReceiveSocketSW rs, SendSocketSW ss, Bridge br, IPList cip) {
+		this(cm, un, br, cip);
+		this.sendSocket = ss;
+		this.receiveSocket = rs;
+		this.receiveSocket.setInformable(msgUpdater);
 		enableChat();
 	}
 	
-	
-
-	
-	private void setComponentProperties() {
-		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(evlCloseWindow);
-		this.setBounds(100, 100, 450, 300);
-		this.setContentPane(contentPane);
-		
-		splitPane.resetToPreferredSizes();
-		splitPane.setResizeWeight(1.0);
-		splitPane.setDividerSize(4);
-		
-		pnlComposing.setLayout(new BorderLayout(0, 0));
-		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-		contentPane.setLayout(new BorderLayout(0, 0));
-		
-		composeMessageField.setPreferredSize(new Dimension(10, 30));
-		composeMessageField.setColumns(10);
-		chatToolBar.setFloatable(false);
-		
-		// MESSAGE LOG AREA
-		scrlpnMsgLogArea.setAutoscrolls(true);
-		messageLogTextArea.setEditable(false);
-		messageLogTextArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
-		messageLogTextArea.setRows(10);
-		messageLogTextArea.setWrapStyleWord(true);
-		messageLogTextArea.setLineWrap(true);
-		
-		
-		//MESSAGE LOG UPDATER TIMER
-		updatetimer = new Timer(updatedelay, evlUpdater);
-		updatetimer.setRepeats(true);
-		
-		//ASSIGN LISTENERS
-		composeMessageField.addKeyListener(evlmsgField);
-		btnSendButton.addActionListener(evlSendButton);
-
-		composeMessageField.grabFocus();
-		
-		//BUZZ FEATURE
-		btnBuzz.setMnemonic('B');
-		btnBuzz.setToolTipText("Send a buzz to your friend");
-		btnBuzz.addActionListener(evlBuzzer);
-		
-		buzztime = new Timer(BCMTheme.BUZZ_TIMER_DELAY, evlJiggle);
-		buzztime.setRepeats(true);
-		genBuzzMagnitudeArray();
-		
-		//DISABLE BY DEFAULT
-		composeMessageField.setEnabled(false);
-		messageLogTextArea.setEnabled(false);
-		btnBuzz.setEnabled(false);
-		btnSendButton.setEnabled(false);
-		this.setTitle("Attempting to connect to " + chatmate.getNickname());
-		lblisTypingLabel.setText("Attempting to connect to " + chatmate.getNickname());
+	private void timeToClose() {
+		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
+		if (receiveSocket != null) receiveSocket.end();
+		if (sendSocket != null)    sendSocket.end();
+		//FIXME what if chatmate is null? Is chatmate ever null?
+		connectedIPs.removeIP(chatmate.getIP());		//removeIP has internal checking if it exists 
+    	this.dispose();
 	}
 	
+	public void enableChat (){
+		composeMessageField.setEnabled(true);
+		messageLogTextArea.setEnabled(true);
+		btnBuzz.setEnabled(true);
+		btnSendButton.setEnabled(true);
+		composeMessageField.grabFocus();
+		this.setTitle(chatmate.getNickname());
+		loadingIndicator.setVisible(false);
+		lblActivityLabel.setText("");
+		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
+		updatetimer.start();
+		
+	}
+	
+
 	
 	private String getMessageBoxContents() {
 		if(!composeMessageField.getText().equals("")) {
@@ -192,45 +74,19 @@ public class ChatWindow extends JFrame {
 		return "";
 	}
 	
-	/*
-	// replace contents with something that hooks onto the client thread 
-	private void sendMessage(String msg) {
-		//TODO: Pass data to the thread to send a message
-		//messageLogTextArea.append("\n<" + username + "> " + msg + "");   // dummy send
-		//ff.sendMsg(msg);
-	}*/
-	
 	private void sendIsTyping() {
-		bridge.putMessage(BCMProtocol.ISTYPING_CODE + "");
-		//TODO: Pass data to the thread to send the typing status
-	    // code is BCMProtocol.ISTYPING_CODE
-		
+		bridge.putMessage(BCMProtocol.ISTYPING_CODE + "");		
 	}
 	
 	private void sendBuzz() {
 		bridge.putMessage(BCMProtocol.BUZZ_CODE + "");
-		//TODO: Pass data to the thread to send a buzz
-		// code is BCMProtocol.BUZZ_CODE
-		
 	}
 	
+
 	
 	
 	
-	private void setComponentHierarchy() {
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		contentPane.add(splitPane, BorderLayout.CENTER);
-		pnlComposing.add(composeMessageField, BorderLayout.CENTER);
-		pnlComposing.add(btnSendButton, BorderLayout.EAST);
-		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
-		chatToolBar.add(btnBuzz);
-		chatToolBar.add(toolbarSeparator);
-		chatToolBar.add(lblisTypingLabel);
-	}
-	
-	
-	
-	// BUZZ FUNCTION
+	//XXX BUZZ FUNCTION
 	private void buzzWindow(){
 		if (currentBuzzFrame == 0) {
 			
@@ -259,14 +115,12 @@ public class ChatWindow extends JFrame {
 		}
 	}
 	
-	// EVL JIGGLE IS REPEATEDLY TRIGGERED
 	private ActionListener evlJiggle = new ActionListener() {
 		public void actionPerformed(ActionEvent ae){
 			oscillateWindow();
 		}
 	};
 	
-	// CONSEQUENTLY, OSCILLATEWINDOW IS CALLED SEVERAL TIMES
 	private void oscillateWindow(){
 		if (currentBuzzFrame < BCMTheme.MAX_BUZZ_FRAMES) {
 			this.setBounds(boundsholder.x + bdaX[currentBuzzFrame], boundsholder.y + bdaY[currentBuzzFrame], boundsholder.width, boundsholder.height);
@@ -281,8 +135,6 @@ public class ChatWindow extends JFrame {
 	}
 	
 	
-	
-
 	
 	//LISTENERS
 	private KeyAdapter evlmsgField = new KeyAdapter() {
@@ -324,25 +176,12 @@ public class ChatWindow extends JFrame {
 		}
 	};
 	
-	private void showIsTyping() {
-		this.setTitle(chatmate.getNickname() + " is typing...");
-		lblisTypingLabel.setText(chatmate.getNickname() + " is typing...");
-	}
-	
-	private void showNotTyping() {
-		this.setTitle(chatmate.getNickname());
-		lblisTypingLabel.setText("");
-	}
-	
-	
+	//XXX INCOMING MESSAGE PARSING
 	private void parseIncomingMessage(String currMessage) {
-		
 		char code;
-
 			code = currMessage.charAt(0);
-			
 			if(code == BCMProtocol.MESSAGE_CODE) {
-				messageLogTextArea.append("\n" + chatmate.getNickname() + ": " + currMessage.substring(1));
+				messageLogTextArea.append(  BCMTheme.chatMessage(chatmate, currMessage.substring(1))  );
 				showNotTyping();
 			}
 			else if (code == BCMProtocol.CLOSED_CODE) {
@@ -358,42 +197,33 @@ public class ChatWindow extends JFrame {
 				buzzWindow();
 				showNotTyping();
 			}
-			
 	}
 	
-	// WINDOW CLOSER
+	private void showIsTyping() {
+		this.setTitle(BCMTheme.isTypingMessage(chatmate));
+		lblActivityLabel.setText(BCMTheme.isTypingMessage(chatmate));
+	}
+	
+	private void showNotTyping() {
+		this.setTitle(chatmate.getNickname());
+		lblActivityLabel.setText("");
+	}
+	
 	private WindowAdapter evlCloseWindow = new WindowAdapter() {
 	    public void windowClosing(WindowEvent e) {
 	        timeToClose();
 	    }
 	};
 	
-	private void timeToClose() {
-		//ff.cancel(false);
-		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
-		receiveSocket.end();
-		sendSocket.end();
-    	this.dispose();
-	}
 	
-	
+	//XXX Networking
 	public void setReceiveSocket (ReceiveSocketSW receiveSocket){
 		this.receiveSocket = receiveSocket;
-		this.receiveSocket.setInformable(informable);
+		this.receiveSocket.setInformable(msgUpdater);
 	}
 	
 	public void setSendSocket (SendSocketSW sendSocket){
 		this.sendSocket = sendSocket;
-	}
-	
-	public void enableChat (){
-		composeMessageField.setEnabled(true);
-		messageLogTextArea.setEnabled(true);
-		btnBuzz.setEnabled(true);
-		btnSendButton.setEnabled(true);
-		this.setTitle("");
-		lblisTypingLabel.setText("");
-		updatetimer.start();
 	}
 	
 	//FAKEFRIEND
@@ -411,6 +241,140 @@ public class ChatWindow extends JFrame {
 	}*/
 	
 	
+	//XXX SET COMPONENT PROPERTIES
+	private void setComponentHierarchy() {
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		contentPane.add(splitPane, BorderLayout.CENTER);
+		pnlComposing.add(composeMessageField, BorderLayout.CENTER);
+		pnlComposing.add(btnSendButton, BorderLayout.EAST);
+		pnlComposing.add(chatToolBar, BorderLayout.NORTH);
+		chatToolBar.add(btnBuzz);
+		chatToolBar.add(toolbarSeparator);
+		chatToolBar.add(lblActivityLabel);
+		chatToolBar.add(Box.createHorizontalStrut(5));
+		chatToolBar.add(loadingIndicator);
+	}
+	
+	private void setComponentProperties() {
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(evlCloseWindow);
+		this.setBounds(100, 100, 450, 300);
+		this.setContentPane(contentPane);
+		
+		splitPane.resetToPreferredSizes();
+		splitPane.setResizeWeight(1.0);
+		splitPane.setDividerSize(4);
+		
+		pnlComposing.setLayout(new BorderLayout(0, 0));
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		composeMessageField.setPreferredSize(new Dimension(10, 30));
+		composeMessageField.setColumns(10);
+		composeMessageField.grabFocus();
+		chatToolBar.setFloatable(false);
+		
+		loadingIndicator.setMaximumSize(new Dimension(30, 14));
+		loadingIndicator.setIndeterminate(true);
+		loadingIndicator.setFocusTraversalKeysEnabled(false);
+		loadingIndicator.setFocusable(false);
+		loadingIndicator.setVisible(false);
+		
+		// MESSAGE LOG AREA
+		scrlpnMsgLogArea.setAutoscrolls(true);
+		messageLogTextArea.setEditable(false);
+		messageLogTextArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		messageLogTextArea.setRows(10);
+		messageLogTextArea.setAutoscrolls(true);
+		messageLogTextArea.setWrapStyleWord(true);
+		messageLogTextArea.setLineWrap(true);
+		
+		//MESSAGE LOG UPDATER TIMER
+		updatetimer = new Timer(updatedelay, evlUpdater);
+		updatetimer.setRepeats(true);
+		
+		//ASSIGN LISTENERS
+		composeMessageField.addKeyListener(evlmsgField);
+		btnSendButton.addActionListener(evlSendButton);
+
+		composeMessageField.grabFocus();
+		
+		//BUZZ FEATURE
+		btnBuzz.setMnemonic('B');
+		btnBuzz.setToolTipText("Send a buzz to your friend");
+		btnBuzz.addActionListener(evlBuzzer);
+		
+		buzztime = new Timer(BCMTheme.BUZZ_TIMER_DELAY, evlJiggle);
+		buzztime.setRepeats(true);
+		genBuzzMagnitudeArray();
+		
+		//DISABLE BY DEFAULT
+		composeMessageField.setEnabled(false);
+		messageLogTextArea.setEnabled(false);
+		btnBuzz.setEnabled(false);
+		btnSendButton.setEnabled(false);
+		this.setTitle(BCMTheme.attemptingConnectMessage(chatmate));
+		lblActivityLabel.setText(BCMTheme.attemptingConnectMessage(chatmate));
+	}
 	
 	
+	public void setConnectedIPs(IPList ipl) {
+		connectedIPs = ipl;
+	}
+	
+	
+	//XXX VARIABLES
+		private static final long serialVersionUID = 958392446358889555L;
+		private Friend chatmate;
+		private String username;
+		private IPList connectedIPs;
+
+		//CONNECTIONS
+		//private ManagerSocket mgtSocket = new ManagerSocket();
+		
+		// MESSAGE LOG UPDATER
+		private Informable msgUpdater;
+		private Informable newMessageUpdater() {
+			return (  new Informable() {
+				@Override
+				public void messageReceived(String message){
+					parseIncomingMessage(message);
+				}
+			} );
+		}
+		
+		// ISTYPING REFRESHER
+		private Timer updatetimer;
+		private int updatedelay = 3000;
+			
+		// BUZZ FUNCTION VARIABLES
+			private short buzzBuffer = 0;
+			private Timer buzztime;
+			private short currentBuzzFrame;
+			private int[] bdaX;
+			private int[] bdaY;
+			private double[] baMagnitude = new double[BCMTheme.MAX_BUZZ_FRAMES];
+			private Rectangle boundsholder;
+			
+		// COMPONENTS
+		private JPanel contentPane = new JPanel();	
+			private JPanel pnlComposing = new JPanel();
+				private JTextField composeMessageField = new JTextField();
+				private JButton btnSendButton = new JButton("Send");
+				private final JTextArea messageLogTextArea = new JTextArea();
+				private final JScrollPane scrlpnMsgLogArea = new JScrollPane(messageLogTextArea);
+				private final JToolBar chatToolBar = new JToolBar();
+					private final JButton btnBuzz = new JButton("BUZZ");
+					private final JLabel lblActivityLabel = new JLabel("");
+					private final JProgressBar loadingIndicator = new JProgressBar();
+					private final Component toolbarSeparator = Box.createHorizontalStrut(20);
+					
+		private JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrlpnMsgLogArea, pnlComposing);
+		
+		
+		//NETWORKING
+		private ReceiveSocketSW receiveSocket;
+		private SendSocketSW sendSocket;
+		private Bridge bridge;
+		
 }

@@ -9,23 +9,22 @@ import java.net.Socket;
 
 import javax.swing.JOptionPane;
 
-import bcmBackend.Friend;
-import bcmGUI.ChatWindow;
+import bcmBackend.*;
+import bcmGUI.*;
 
 public class RequestSocket extends Thread {
-	//Information passed to the Socket to facilitate creation
 	private Friend selectedFriend;
 	private String username;
+	private IPList connectedIPs;
 	
-	public RequestSocket(Friend selectedFriend, String username){
+	public RequestSocket(Friend selectedFriend, String username, IPList cip){
 		this.selectedFriend = selectedFriend;
 		this.username = username;
+		this.connectedIPs = cip;
 		this.start();
-		
 	}
 	
 	public void run(){
-		String commandTyped;	
 		Socket connection = null;
 		BufferedReader incoming;
 		PrintWriter outgoing;
@@ -36,20 +35,20 @@ public class RequestSocket extends Thread {
 		Bridge bridge = new Bridge();
 		ChatWindow cw = null;
 		
-		if(selectedFriend == null)
-//			System.out.println("SelectedFriend = null");
-		cw = new ChatWindow(selectedFriend, username, bridge);
+		//if(selectedFriend == null) System.out.println("SelectedFriend = null");
+			
+			
+		cw = new ChatWindow(selectedFriend, username, bridge, connectedIPs);
 		try{
-			//JOptionPane.showMessageDialog(null, "Connection Attempting. Please wait.");
 			try{
 			connection = new Socket(selectedFriend.getIP(), BCMProtocol.MANAGER_PORT);
 			} catch (Exception ce) {
-	//			System.out.println(ce.toString());
+				//System.out.println(ce.toString());
 				cw.dispose();
 				JOptionPane.showMessageDialog(null, "Could not Connect.");
 				return;
 			}
-//			System.out.println("Socket Built");
+			//System.out.println("Socket Built");
 			incoming = new BufferedReader( new InputStreamReader(connection.getInputStream()) );
 			outgoing = new PrintWriter(connection.getOutputStream(), true);
 			
@@ -59,30 +58,31 @@ public class RequestSocket extends Thread {
 			//Verify handshake
 			messageIn = incoming.readLine();
 			if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
+				connection.close();	//FIXME am I doing this right?
 				throw new Exception("Connected program is not a BCMsgr");
 			}
-		//	System.out.println("Handshake Successful. Now Connected.");
+			//System.out.println("Handshake Successful. Now Connected.");
 			
-			outgoing.println(connection.getLocalAddress());//Inform the Manager that connection building is complete
-			messageIn = incoming.readLine(); //receive confirmation from Manager
-			if(messageIn.equalsIgnoreCase("disallowed"))
-				return;
+			outgoing.println(connection.getLocalAddress());		//Inform the Manager that connection building is complete
+			messageIn = incoming.readLine();					//receive confirmation from Manager
+			if(messageIn.equalsIgnoreCase(BCMProtocol.CONNECTION_DISALLOWED)) return;
+			
 			//Propose & Build the first connection -> Manager:Receiver::Requester:Sender
 			proposedPort = proposePort();
 			
 			while(true){
 				
 				outgoing.println(proposedPort);
-			//	System.out.println("Sending " + proposedPort + " to Manager.");
+				//System.out.println("Sending " + proposedPort + " to Manager.");
 				
 				messageIn = incoming.readLine();
-			//	System.out.println("Received from Manager: \"" + messageIn + "\"");
+				//System.out.println("Received from Manager: \"" + messageIn + "\"");
 				
-				if(messageIn.equalsIgnoreCase("available") == true){ //If proposed port is available
+				if(messageIn.equalsIgnoreCase(BCMProtocol.PORT_AVAILABLE) == true){ //If proposed port is available
 					//System.out.println("Manager says port is available");
 					ss = new SendSocketSW(selectedFriend.getIP(),proposedPort, bridge); //Build a Sender
 					//System.out.println("SendSocket built on Requester Side");
-					outgoing.println("completed");//Inform the Manager that connection building is complete
+					outgoing.println(BCMProtocol.CONNECTION_SUCCESS);//Inform the Manager that connection building is complete
 					break;
 				} else {
 				//	System.out.println("Manager says:" + messageIn);
@@ -109,7 +109,7 @@ public class RequestSocket extends Thread {
 				messageIn = incoming.readLine();
 			//	System.out.println("Received from Manager: \"" + messageIn + "\"");
 				
-				if(messageIn.equalsIgnoreCase("available") == true){ //If proposed port is available
+				if(messageIn.equalsIgnoreCase(BCMProtocol.PORT_AVAILABLE) == true){ //If proposed port is available
 				//	System.out.println("Manager says port is available");
 					rs = new ReceiveSocketSW(proposedPort);
 				//	System.out.println("ReceiveSocket built on Requester Side");

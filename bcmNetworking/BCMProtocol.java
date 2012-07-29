@@ -9,6 +9,15 @@ public class BCMProtocol {
 	//Secret Handshake
 	public static final String HANDSHAKE = "PaulPogi";
 	
+	//Protocol Messages
+	public static final String CONNECTION_DISALLOWED = "disallowed";
+	public static final String CONNECTION_APPROVED = "approved";
+	public static final String PORT_AVAILABLE = "available";
+	public static final String PORT_UNAVAILABLE = "unavailable";
+	public static final String CONNECTION_SUCCESS = "completed";
+	
+	
+	
 	//list of prefixes that the ChatServer will
 	public static final char MESSAGE_CODE = '0';
 	public static final char BUZZ_CODE = '1';

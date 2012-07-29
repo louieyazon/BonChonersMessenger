@@ -2,6 +2,7 @@ package bcmGUI;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -15,6 +16,7 @@ import bcmNetworking.*;
 
 public class FriendsListWindow extends JFrame {
 	
+	//XXX CONSTRUCTOR
 	public FriendsListWindow() throws IOException {
 		setWindowProperties();
 		setComponentProperties(); 				// contains all component modification
@@ -27,21 +29,29 @@ public class FriendsListWindow extends JFrame {
 	}
 		
 	//XXX WINDOW MODES
+	private void signin() {
+		if (!fldUserName.getText().trim().equals("")) {
+			username = fldUserName.getText();
+			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username));
+			connectedIPs = new IPList();
+			managerSocket = new ManagerSocket(friendListObj, username, connectedIPs);
+			modeFriendsList();
+			imOnline = true;
+		}
+	}
+	
 	private void modeFriendsList() {
 		this.setContentPane(pnlMainFriends);
 		this.repaint();
 		this.revalidate();
 	}
 	
-	private void signin() {
-		if (!fldUserName.getText().trim().equals("")) {
-			imOnline = true;
-			username = fldUserName.getText();
-			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
-			modeFriendsList();
-			connectedIPs = new IPList();
-			managerSocket = new ManagerSocket(friendListObj, username, connectedIPs);
+	private void signout() {
+		if (managerSocket != null) {
+			managerSocket.stopNow();
+			managerSocket = null;
 		}
+		modeLogin();
 	}
 
 	private void modeLogin() {
@@ -95,6 +105,14 @@ public class FriendsListWindow extends JFrame {
 		} 
 	}
 	
+	private Friend searchFriendList(String nicktocheck){
+		for(Friend f: friendListObj.getList()) {
+			if(f.getNickname().equalsIgnoreCase(nicktocheck)) {
+				return f;
+			}
+		}
+		return null;
+	}
 
 	
 	
@@ -194,10 +212,8 @@ public class FriendsListWindow extends JFrame {
 
 		// FIELDS AND BUTTON
 		lblUsername.setAlignmentX(Component.CENTER_ALIGNMENT);
-		lblPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
 		fldUserName.setText("userad");
 		fldUserName.setColumns(BCMTheme.loginFieldWidth);
-		fldPassword.setColumns(BCMTheme.loginFieldWidth);
 		
 		btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnLogin.addMouseListener(evlSignIn);
@@ -224,13 +240,7 @@ public class FriendsListWindow extends JFrame {
 		// TOP PANEL
 		topPanel.setBorder(new EmptyBorder(3, 3, 3, 3));
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-		cmbStatus.addItemListener(evlSignOut);
-
-		// STATUS COMBO BOX
-		cmbStatus.setToolTipText("Set status");
-			cmbStatus.addItem("Available");
-			cmbStatus.addItem("Offline");
-		// FIXME What's wrong with these items? Also, fix combo box functionality
+		txtSearch.addKeyListener(evlSearchBoxType);
 		
 		// SEARCH BOX
 		txtSearch.setForeground(BCMTheme.colGrayedText);
@@ -249,13 +259,19 @@ public class FriendsListWindow extends JFrame {
 		friendListPanel.setSize(this.getSize());
 		friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
 		
-		// LISTENERS
+		//XXX LISTENER ASSIGNMENTS
 		mntmrAddContact.addMouseListener(evlAddContact);
 		mntmrEditContact.addMouseListener(evlEditContact);	
 		mntmrDeleteContact.addMouseListener(evlDeleteContact);
+		
 		fldUserName.addKeyListener(evlLoginFromTextField);
-		fldPassword.addKeyListener(evlLoginFromTextField);
 		friendListPanel.addMouseListener(evlPanelClick);
+		mntmSignOut.addActionListener(evlSignOut);
+		mntmExit.addActionListener(evlExitMenu);
+		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
+		mntmImportFriends.addActionListener(evlImportFriends);
+		mntmImportFriends.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK));
+		
 	}
 
 	private void setFriendsListComponentHierarchy() {
@@ -270,13 +286,22 @@ public class FriendsListWindow extends JFrame {
 			
 		pnlMainFriends.add(pnlProg, BorderLayout.CENTER);
 		pnlProg.add(topPanel, BorderLayout.NORTH);
-		topPanel.add(cmbStatus);
 		topPanel.add(txtSearch);
 		pnlProg.add(scrollPane, BorderLayout.CENTER);
+		
+		
+		//MENU BAR
+		pnlMainFriends.add(menuBar, BorderLayout.NORTH);
+		menuBar.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		menuBar.setBorderPainted(false);
+		menuBar.add(mnMessenger);
+			mnMessenger.add(mntmSignOut);
+			mnMessenger.add(mntmImportFriends);
+			mnMessenger.add(mntmExit);
+		
+		//STATUS BAR
 		tbStatusBar.setFloatable(false);
-		
 		pnlMainFriends.add(tbStatusBar, BorderLayout.SOUTH);
-		
 		tbStatusBar.add(lblMessengerStatus);
 	}
 	
@@ -288,9 +313,6 @@ public class FriendsListWindow extends JFrame {
 		pnlLoginFields.add(lbliClientImage);
 			pnlLoginFields.add(lblUsername);
 			pnlLoginFields.add(fldUserName);		
-				pnlLoginFields.add(Box.createVerticalStrut(BCMTheme.strutHeight));		
-			pnlLoginFields.add(lblPassword);
-			pnlLoginFields.add(fldPassword);			
 				pnlLoginFields.add(Box.createVerticalStrut(BCMTheme.strutHeight));
 			pnlLoginFields.add(btnLogin);
 			pnlLoginFields.add(lblIp);
@@ -312,14 +334,16 @@ public class FriendsListWindow extends JFrame {
 	private JLabel lbliClientImage = new JLabel("   ");
 	private final JLabel lblUsername = new JLabel("Username");
 	private JTextField fldUserName = new JTextField();
-	private final JLabel lblPassword = new JLabel("Password");
-	private JPasswordField fldPassword = new JPasswordField();
 	private JButton btnLogin = new JButton("Sign In");
 	private JLabel lblIp = new JLabel ();
 
 	// TOP PANEL
+	private final JMenuBar menuBar = new JMenuBar();
+	private final JMenu mnMessenger = new JMenu("Messenger");
+	private final JMenuItem mntmExit = new JMenuItem("Exit");
+	private final JMenuItem mntmSignOut = new JMenuItem("Sign out");
+	private final JMenuItem mntmImportFriends = new JMenuItem("Import Friends List...");
 	private JPanel topPanel = new JPanel();
-	private JComboBox cmbStatus = new JComboBox();
 	private JTextField txtSearch = new JTextField();
 	private String deftxtSearch = "Search...";
 
@@ -375,6 +399,25 @@ public class FriendsListWindow extends JFrame {
 			}
 		}
 	};
+	
+	private ActionListener evlExitMenu = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			timeToClose();
+		}
+	};
+	
+	private ActionListener evlImportFriends = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			//TODO JFileChooser for picking txt file for import
+			
+		}
+	};
+	
+	private ActionListener evlSignOut = new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+			signout();
+		}
+	};
 
 	private MouseAdapter evlSignIn = new MouseAdapter() {
 		@Override
@@ -384,14 +427,24 @@ public class FriendsListWindow extends JFrame {
 	};
 	
 	
-	//FIXME Use this
-	private ItemListener evlSignOut = new ItemListener() {
-		public void itemStateChanged(ItemEvent ie) {
-			if (ie.getStateChange() == ItemEvent.SELECTED && ie.getItem().toString().equalsIgnoreCase("Offline")) {
-				modeLogin();
+	private KeyAdapter evlSearchBoxType = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent ke) {
+			if (ke.getKeyCode() == KeyEvent.VK_ENTER) { 
+				//TODO START CHAT
+				attemptSearchBoxChat();
 			}
 		}
 	};
+	
+	
+	private void attemptSearchBoxChat() {
+		if (searchFriendList(txtSearch.getText()) != null) {
+			startChat( searchFriendList(txtSearch.getText())  );
+			txtSearch.setText("");
+		}
+		
+	}
 	
 	
 	private KeyAdapter evlLoginFromTextField = new KeyAdapter() {
@@ -457,15 +510,8 @@ public class FriendsListWindow extends JFrame {
 				hideContactRightClickMenu();
 				
 				// DOUBLE CLICK OPENS CHAT WIDOW
-				if (me.getClickCount() == 2) {
-					System.out.println("double click detected");
-					
-					if (  connectedIPs.find(selectedFriend.getIP()) == null  ) {
-						System.out.println("trying to connect");
-						connectedIPs.add(selectedFriend.getIP());
-						try { new RequestSocket(selectedFriend, username); }
-						catch (Exception e) { e.printStackTrace(); }
-					}
+				if (me.getClickCount() == 2) {					
+					startChat();
 				}
 				
 			}
@@ -473,29 +519,29 @@ public class FriendsListWindow extends JFrame {
 		
 	};
 	
+	private void startChat() {
+		if (  connectedIPs.find(selectedFriend.getIP()) == null  ) {		// reject double chat window
+			System.out.println("trying to connect");
+			connectedIPs.add(selectedFriend.getIP());
+			try { new RequestSocket(selectedFriend, username, connectedIPs); }
+			catch (Exception e) { e.printStackTrace(); }
+		}
+	}
+	
+	private void startChat(Friend f) {
+		selectedFriend = f;
+		startChat();
+		selectedFriend = null;
+	}
+	
+	
 	private MouseAdapter evlPanelClick = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			hideContactRightClickMenu();
 			deselectLabel();
 		}
-	};
-	
-	
-	
-	//XXX IPList
-	public class IPList extends LinkedList<String> {
-		private static final long serialVersionUID = -2482412766406762970L;
-
-		public String find(String ipToSearch) {
-			for (String k: this) {
-				if (ipToSearch.equals(k)) return k;
-			}
-			return null;
-		}
-		
-		
-	}
+	};	
 	
 	
 

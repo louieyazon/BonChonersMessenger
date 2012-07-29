@@ -16,6 +16,7 @@ public class ManagerSocket extends Thread{
 	private ArrayList<Integer> takenPorts;
 	private FriendList friendList;
 	private String username;
+	private boolean stopped;
 	
 	public ManagerSocket(FriendList friendList, String username){
 		this.friendList = friendList;
@@ -36,12 +37,13 @@ public class ManagerSocket extends Thread{
 		int proposedPort;
 		Bridge bridge;
 		
-		while(true) { //Perpetually listen for incoming connections, but allowing only one build at a time
+		while(!stopped) { //Perpetually listen for incoming connections, but allowing only one build at a time
 			try{
 				//Initialize Server
 				listener = new ServerSocket(port);
 				//System.out.println("Listening on port" + listener.getLocalPort());
-				
+				if(stopped)
+					return;
 				//Upon successful connection, close listener
 				connection = listener.accept();
 				listener.close();
@@ -187,5 +189,9 @@ public class ManagerSocket extends Thread{
 		if(toReturn == null)
 			toReturn = new Friend("unknown", "unknown", reqIP);
 		return toReturn;
+	}
+	
+	public void stopNow(){
+		this.stopped = true;
 	}
 }

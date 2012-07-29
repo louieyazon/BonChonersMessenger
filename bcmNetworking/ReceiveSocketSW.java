@@ -1,42 +1,35 @@
 package bcmNetworking;
-import java.net.*;
-import java.io.*;
 
-public class ReceiveSocket extends Thread{
-	static final int DEF_PORT = 3232;
-	static final int DEF_PORT2 = 3233;
-	
-	//Secret Handshake
-	static final String HANDSHAKE = "PaulPogi";
-	
-	//list of prefixes that the ChatServer will
-	static final char MESSAGE_CODE = '0';
-	static final char CLOSED_CODE = '4';
-	
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.List;
+
+import javax.swing.SwingWorker;
+
+import bcmBackend.Informable;
+
+public class ReceiveSocketSW extends SwingWorker<Integer, String>{
+
 	//Information passed to the Socket to facilitate creation
-	//private String ipAdd;
 	private int curPort;
+	private Informable informable;
 	
-	//Regarding the status of its connection
-	private boolean connectStatus = false;
-	
-	public ReceiveSocket(int curPort){
-		//this.ipAdd = ipAdd;
+	public ReceiveSocketSW(int curPort){
 		this.curPort = curPort;
-		this.start();
-		
+		this.execute();
 	}
 	
-	public void run(){
-		
-		int port;
+	@Override
+	protected Integer doInBackground() throws Exception {
+		int port = curPort;
 		ServerSocket listener;
 		Socket connection;
 		BufferedReader incoming;
 		PrintWriter outgoing;
 		String messageIn;
-		
-		port = curPort;
 		
 		try{
 			//Initialize Server
@@ -51,52 +44,62 @@ public class ReceiveSocket extends Thread{
 			outgoing = new PrintWriter(connection.getOutputStream());
 			
 			//Send handshake
-			outgoing.println(HANDSHAKE);
+			outgoing.println(BCMProtocol.HANDSHAKE);
 			outgoing.flush();
 			//receive handshake and verify 
 			/*TODO: Create a loop that will wait for the right connection for an 
 			* appropriate amount of time, then timeout. 
 			*/
 			messageIn = incoming.readLine();
-			if(! HANDSHAKE.equals(messageIn)){
+			if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
 				throw new Exception("Connected program is not a BCMsgr");
 			}
-			connectStatus = true;
 			System.out.println("Connected.");
 			
 		} catch (Exception e) {
 			System.out.println("An error occured while opening the connection.");
 			System.out.println(e.toString());
-			return;
+			return -1;
 		}
 		
 			//Continuously read lines from the input stream
 		try{
 			while(true) {
+			
 				messageIn = incoming.readLine();
 				
 				if(messageIn.length() > 0) {
+					System.out.println(messageIn);
+					publish(messageIn);
 					
-					if(messageIn.charAt(0) == CLOSED_CODE) {
+					/*if(messageIn.charAt(0) == CLOSED_CODE) {
 						System.out.println("Quit Command Recieved");
 						connection.close();
 						break;
 					} else if (messageIn.charAt(0) == MESSAGE_CODE) {
 						messageIn = messageIn.substring(1);
 						System.out.println(messageIn);
-					}
+					}*/
 				}
 			}
 			
 			
 		} catch (Exception e) {
 			System.out.println("Sorry, an error has occured. Connection lost.");
-			System.exit(1);
+			//System.exit(1);
+			return -1;
 		}
 	}
 	
-	public boolean getConnectStatus(){
-		return this.connectStatus;
+	public void setInformable(Informable informable){
+		this.informable = informable;
+	}
+	
+	@Override
+	protected void process(List<String> chunks){
+		for(String message : chunks){
+			informable.messageReceived(message);
+		}
 	}
 	
 }

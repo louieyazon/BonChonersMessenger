@@ -13,7 +13,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 import javax.swing.Box;
@@ -54,6 +56,7 @@ public class FriendsListWindow extends JFrame {
 	private final JLabel lblPassword = new JLabel("Password");
 	private JPasswordField fldPassword = new JPasswordField();
 	private JButton btnLogin = new JButton("Sign In");
+	private JLabel lblIp = new JLabel ();
 
 	// TOP PANEL
 	private JPanel topPanel = new JPanel();
@@ -234,7 +237,7 @@ public class FriendsListWindow extends JFrame {
 	
 
 	// CONSTRUCTOR
-	public FriendsListWindow() {
+	public FriendsListWindow() throws IOException {
 		setWindowProperties();
 		setComponentProperties(); // contains all component modification
 		setLoginComponentProperties();
@@ -257,7 +260,7 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	
-	private void setLoginComponentProperties(){
+	private void setLoginComponentProperties() throws UnknownHostException{
 		pnlLogin.setLayout(new BoxLayout(pnlLogin, BoxLayout.Y_AXIS));
 		pnlLoginFields.setMaximumSize(new Dimension(150, 300));
 		pnlLoginFields.setLayout(new BoxLayout(pnlLoginFields, BoxLayout.Y_AXIS));
@@ -276,6 +279,11 @@ public class FriendsListWindow extends JFrame {
 		btnLogin.setMaximumSize(BCMTheme.dimButtonSize);
 		btnLogin.setMinimumSize(BCMTheme.dimButtonSize);
 		btnLogin.setPreferredSize(BCMTheme.dimButtonSize);
+		
+		lblIp.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblIp.setText("IP: "+ InetAddress.getLocalHost().getHostAddress());
+		
+		
 		
 
 	}
@@ -415,6 +423,7 @@ public class FriendsListWindow extends JFrame {
 			pnlLoginFields.add(fldPassword);			
 				pnlLoginFields.add(Box.createVerticalStrut(BCMTheme.strutHeight));
 			pnlLoginFields.add(btnLogin);
+			pnlLoginFields.add(lblIp);
 	}
 
 	

@@ -30,9 +30,16 @@ public class FriendList {
 	}
 	
 	
-	public Friend searchFriends(String ipAdd){
-	       for(Friend friend : friendArray){
-	       	    if (friend.getIP().equals(ipAdd)) return friend;
+	public Friend searchFriendWithIP(String ipAdd){
+	       for(Friend fr : friendArray){
+	       	    if (fr.getIP().equals(ipAdd)) return fr;
+	       }
+	    return null;
+	}
+	
+	public Friend searchFriendWithNickname(String nickname){
+	       for(Friend fr : friendArray){
+	       	    if (fr.getNickname().equals(nickname)) return fr;
 	       }
 	    return null;
 	}

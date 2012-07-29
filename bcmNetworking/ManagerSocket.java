@@ -192,7 +192,7 @@ public class ManagerSocket extends Thread{
 	}*/
 	
 	public Friend getRequestingFriend(String reqIP){
-		Friend toReturn = friendList.searchFriends(reqIP);
+		Friend toReturn = friendList.searchFriendWithIP(reqIP);
 		if(toReturn == null)
 			toReturn = new Friend("unknown", "unknown", reqIP);
 		return toReturn;

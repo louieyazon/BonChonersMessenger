@@ -67,6 +67,22 @@ public class FriendsListWindow extends JFrame {
 		System.exit(0);
 	}
 	
+	//XXX ChatWindow Initiation
+	private void startChat() {
+		if (  connectedIPs.find(selectedFriend.getIP()) == null  ) {		// reject double chat window
+			System.out.println("trying to connect");
+			connectedIPs.add(selectedFriend.getIP());
+			try { new RequestSocket(selectedFriend, username, connectedIPs); }
+			catch (Exception e) { e.printStackTrace(); }
+		}
+	}
+	
+	private void startChat(Friend f) {
+		selectedFriend = f;
+		startChat();
+		selectedFriend = null;
+	}
+	
 	
 	
 	//XXX Friendlist manipulators
@@ -104,17 +120,7 @@ public class FriendsListWindow extends JFrame {
 			friendListObj.saveChanges();
 		} 
 	}
-	
-	private Friend searchFriendList(String nicktocheck){
-		for(Friend f: friendListObj.getList()) {
-			if(f.getNickname().equalsIgnoreCase(nicktocheck)) {
-				return f;
-			}
-		}
-		return null;
-	}
 
-	
 	
 	
 	private void showContactRightClickMenu() {
@@ -325,10 +331,27 @@ public class FriendsListWindow extends JFrame {
 	
 	//XXX VARIABLES
 	private static final long serialVersionUID = 1L;
+	
+	// ADT
+	private Friend selectedFriend; 
+	private FriendList friendListObj = new FriendList();
+	private LinkedList<JLabel> friendLabel = new LinkedList<JLabel>();
+	private IPList connectedIPs = new IPList();
+	private JLabel selectedLabel;
+	
+	// VALUES
+	private Dimension dimMinWindowSize = new Dimension(200, 250);
+	private boolean imOnline = false;
+	private String username;
+
+	//NETWORKING
+	private ManagerSocket managerSocket;
+	
+	// SWING
 	private JPanel pnlLogin = new JPanel();
 	private JPanel pnlMainFriends = new JPanel();
 	private final JPanel pnlProg = new JPanel();
-
+	
 	// LOGIN PANEL
 	private JPanel pnlLoginFields = new JPanel();
 	private JLabel lbliClientImage = new JLabel("   ");
@@ -359,23 +382,12 @@ public class FriendsListWindow extends JFrame {
 		private final JMenuItem mntmrEditContact = new JMenuItem("Edit Contact...");
 		private final JMenuItem mntmrDeleteContact = new JMenuItem("Delete Contact...");
 		
-		
-		
-	//XXX ADT
-	private Friend selectedFriend; 
-	private FriendList friendListObj = new FriendList();
-	private LinkedList<JLabel> friendLabel = new LinkedList<JLabel>();
-	private IPList connectedIPs = new IPList();
-	private JLabel selectedLabel;
 
 
-	// VALUES
-	private Dimension dimMinWindowSize = new Dimension(200, 250);
-	private boolean imOnline = false;
-	private String username;
+
+
 	
-	//NETWORKING
-	private ManagerSocket managerSocket;
+
 	
 	
 	
@@ -431,7 +443,6 @@ public class FriendsListWindow extends JFrame {
 		@Override
 		public void keyPressed(KeyEvent ke) {
 			if (ke.getKeyCode() == KeyEvent.VK_ENTER) { 
-				//TODO START CHAT
 				attemptSearchBoxChat();
 			}
 		}
@@ -439,8 +450,9 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	private void attemptSearchBoxChat() {
-		if (searchFriendList(txtSearch.getText()) != null) {
-			startChat( searchFriendList(txtSearch.getText())  );
+		Friend friendToChat = friendListObj.searchFriendWithNickname(txtSearch.getText().trim());
+		if (friendToChat != null) {
+			startChat( friendToChat );
 			txtSearch.setText("");
 		}
 		
@@ -518,22 +530,6 @@ public class FriendsListWindow extends JFrame {
 		}
 		
 	};
-	
-	private void startChat() {
-		if (  connectedIPs.find(selectedFriend.getIP()) == null  ) {		// reject double chat window
-			System.out.println("trying to connect");
-			connectedIPs.add(selectedFriend.getIP());
-			try { new RequestSocket(selectedFriend, username, connectedIPs); }
-			catch (Exception e) { e.printStackTrace(); }
-		}
-	}
-	
-	private void startChat(Friend f) {
-		selectedFriend = f;
-		startChat();
-		selectedFriend = null;
-	}
-	
 	
 	private MouseAdapter evlPanelClick = new MouseAdapter() {
 		@Override

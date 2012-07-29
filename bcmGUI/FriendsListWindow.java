@@ -168,7 +168,7 @@ public class FriendsListWindow extends JFrame {
 	private void timeToClose() {
     	friendListObj.saveChanges();
     	System.out.println("Friend list saved.");
-		this.dispose();
+		System.exit(0);
 	}
 
 	

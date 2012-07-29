@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import bcmBackend.Friend;
 import bcmBackend.Informable;
+import bcmBackend.bcmPlaySound;
 import bcmNetworking.BCMProtocol;
 import bcmNetworking.Bridge;
 import bcmNetworking.ReceiveSocketSW;
@@ -189,6 +190,7 @@ public class ChatWindow extends JFrame {
 	}
 	
 	private void sendBuzz() {
+		bridge.putMessage("buzz");
 		//TODO: Pass data to the thread to send a buzz
 		// code is BCMProtocol.BUZZ_CODE
 		
@@ -213,6 +215,7 @@ public class ChatWindow extends JFrame {
 	// BUZZ FUNCTION
 	private void buzzWindow(){
 		if (currentBuzzFrame == 0) {
+			//new bcmPlaySound(wavfile)
 			newBuzzArray();
 			boundsholder = this.getBounds();
 			buzztime.start();
@@ -314,18 +317,20 @@ public class ChatWindow extends JFrame {
 			code = currMessage.charAt(0);
 			
 			if(code == BCMProtocol.MESSAGE_CODE) {
-				messageLogTextArea.append("\n" + currMessage.substring(1));
+				messageLogTextArea.append("\n" + chatmate.getNickname() + ": " + currMessage.substring(1));
 				showNotTyping();
 			}
 			else if (code == BCMProtocol.CLOSED_CODE) {
 				messageLogTextArea.append("\n" + chatmate.getNickname() + " has gone offline.");
-				showNotTyping();
+				JOptionPane.showMessageDialog(null, "Chatmate has left the chat. Closing Window.");
+				timeToClose();
 			}
 			else if (code == BCMProtocol.ISTYPING_CODE) {
 				showIsTyping();
 			}
 			else if (code == BCMProtocol.BUZZ_CODE) {
 				buzzBuffer++;
+				buzzWindow();
 				showNotTyping();
 			}
 			

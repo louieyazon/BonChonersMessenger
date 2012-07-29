@@ -55,10 +55,13 @@ public class SendSocketSW extends SwingWorker {
 				char prependCode;
 				if(messageTyped.equalsIgnoreCase("quit")) {
 					prependCode = BCMProtocol.CLOSED_CODE;
+				} else if (messageTyped.equalsIgnoreCase("buzz")){
+					prependCode = BCMProtocol.BUZZ_CODE;
 				}
 				else {
 					prependCode = BCMProtocol.MESSAGE_CODE;
 				}
+				
 				outgoing.println(prependCode + messageTyped);
 			}
 

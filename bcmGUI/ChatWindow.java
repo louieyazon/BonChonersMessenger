@@ -16,6 +16,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -96,7 +97,8 @@ public class ChatWindow extends JFrame {
 		Informable informable = new Informable(){
 			@Override
 			public void messageReceived(String message){
-				messageLogTextArea.append(chatmate.getNickname() + ": " + message);
+				parseIncomingMessage(message);
+				
 			}
 		};
 		this.receiveSocket = receiveSocket;
@@ -294,18 +296,6 @@ public class ChatWindow extends JFrame {
 		}
 	};
 	
-	
-	
-	// UPDATER
-	private ActionListener evlUpdater = new ActionListener() {
-		public void actionPerformed(ActionEvent arg0) {
-			if(buzzBuffer > 0) { buzzWindow(); }
-			parseIncomingMessage();
-		}
-	};
-	
-	
-	
 	private void showIsTyping() {
 		this.setTitle(chatmate.getNickname() + " is typing...");
 		lblisTypingLabel.setText(chatmate.getNickname() + " is typing...");
@@ -317,15 +307,10 @@ public class ChatWindow extends JFrame {
 	}
 	
 	
-	private void parseIncomingMessage() {
+	private void parseIncomingMessage(String currMessage) {
 		
 		char code;
-		String currMessage;
-		
-		while(!messageBuffer.isEmpty())
-		{   
-			currMessage = messageBuffer.removeFirst();   // .removeFirst() returns the removed item from the LinkedList.
-			
+
 			code = currMessage.charAt(0);
 			
 			if(code == BCMProtocol.MESSAGE_CODE) {
@@ -344,9 +329,6 @@ public class ChatWindow extends JFrame {
 				showNotTyping();
 			}
 			
-			
-			
-		}
 	}
 	
 	// WINDOW CLOSER
@@ -358,6 +340,8 @@ public class ChatWindow extends JFrame {
 	
 	private void timeToClose() {
 		//ff.cancel(false);
+		receiveSocket.cancel(false);
+		sendSocket.cancel(false);
     	this.dispose();
 	}
 	

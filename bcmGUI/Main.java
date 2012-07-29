@@ -1,4 +1,7 @@
+package bcmGUI;
+
 import java.awt.EventQueue;
+
 import javax.swing.UIManager;
 
 public class Main {

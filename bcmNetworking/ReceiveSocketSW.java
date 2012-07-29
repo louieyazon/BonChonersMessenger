@@ -64,7 +64,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 		
 			//Continuously read lines from the input stream
 		try{
-			while(true) {
+			while(!isCancelled()) {
 			
 				messageIn = incoming.readLine();
 				
@@ -89,6 +89,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 			//System.exit(1);
 			return -1;
 		}
+		return 0;
 	}
 	
 	public void setInformable(Informable informable){

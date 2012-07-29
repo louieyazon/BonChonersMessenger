@@ -49,7 +49,7 @@ public class SendSocketSW extends SwingWorker {
 			System.out.println("Connected.");
 			
 			
-			while(true) {
+			while(!isCancelled()) {
 				//System.out.print("> ");
 				messageTyped = bridge.getMessage();
 				char prependCode;

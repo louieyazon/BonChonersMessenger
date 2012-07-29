@@ -1,10 +1,38 @@
 package bcmGUI;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.SystemColor;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.InetAddress;
 import java.util.LinkedList;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
 
 import bcmBackend.Friend;
 import bcmBackend.FriendList;
@@ -168,7 +196,7 @@ public class FriendsListWindow extends JFrame {
 				
 				// DOUBLE CLICK OPENS CHAT WIDOW
 				if (me.getClickCount() == 2) {
-					try { new ChatWindow(selectedFriend, username); }
+					try { new RequestSocket(selectedFriend, username); }
 					catch (Exception e) { e.printStackTrace(); }
 				}
 				
@@ -215,7 +243,7 @@ public class FriendsListWindow extends JFrame {
 		buildFriendListButtons(); // initiates the friends list array
 		//modeFriendsList();
 		modeLogin();
-		managerSocket = new ManagerSocket(friendListObj, username);
+		
 	}
 
 	
@@ -404,6 +432,7 @@ public class FriendsListWindow extends JFrame {
 			username = fldUserName.getText();
 			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
 			modeFriendsList();
+			managerSocket = new ManagerSocket(friendListObj, username);
 		}
 	}
 
@@ -469,13 +498,5 @@ public class FriendsListWindow extends JFrame {
 		}
 
 	}
-	
-	
-	public static void main(String[] args){
-		FriendsListWindow mainWindow = new FriendsListWindow();
-		mainWindow.setVisible(true);
-	}
-
-	
 	
 }

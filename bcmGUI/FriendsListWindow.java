@@ -1,39 +1,9 @@
 package bcmGUI;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.SystemColor;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.LinkedList;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import bcmBackend.Friend;
-import bcmBackend.FriendList;
-import bcmNetworking.ManagerSocket;
-import bcmNetworking.RequestSocket;
-
 
 public class FriendsListWindow extends JFrame {
 
@@ -79,10 +49,7 @@ public class FriendsListWindow extends JFrame {
 	private Dimension dimMinWindowSize = new Dimension(200, 250);
 	private boolean imOnline = false;
 	private String username;
-	
-	//NETWORKING
-	private ManagerSocket managerSocket;
-	
+
 	// LISTENERS
 	private FocusAdapter evlsearchGray = new FocusAdapter() {
 		@Override
@@ -119,6 +86,15 @@ public class FriendsListWindow extends JFrame {
 		}
 	};
 	
+	private KeyAdapter evlLoginFromTextField = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent k) {
+			if(k.getKeyCode()== KeyEvent.VK_ENTER){
+				signin();
+			}
+		}
+	};
+	
 	private MouseAdapter evlAddContact = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent me) {
@@ -142,6 +118,20 @@ public class FriendsListWindow extends JFrame {
 			deleteFriend();
 		}
 	};
+	
+
+	// WINDOW CLOSER
+	private WindowAdapter evlCloseWindow = new WindowAdapter() {
+	    public void windowClosing(WindowEvent e) {
+	        timeToClose();
+	    }
+	};
+	
+	private void timeToClose() {
+    	friendListObj.saveChanges();
+    	System.out.println("Friend list saved.");
+		this.dispose();
+	}
 
 	
 	// Listener for clicks on contacts
@@ -168,15 +158,22 @@ public class FriendsListWindow extends JFrame {
 				
 				// DOUBLE CLICK OPENS CHAT WIDOW
 				if (me.getClickCount() == 2) {
-					try { 
-						//new ChatWindow(selectedFriend, username); 
-						new RequestSocket(selectedFriend, username);
-					} catch (Exception e) { e.printStackTrace(); }
+					try { new ChatWindow(selectedFriend, username); }
+					catch (Exception e) { e.printStackTrace(); }
 				}
 				
 			}
 		}
 		
+	};
+	
+	
+	private MouseAdapter evlPanelClick = new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			hideContactRightClickMenu();
+			deselectLabel();
+		}
 	};
 	
 	
@@ -190,15 +187,13 @@ public class FriendsListWindow extends JFrame {
 		l.setBackground(BCMTheme.colBG);
 		l.repaint();
 	}
-	
-	
+		
 	private void selectLabel(JLabel l) {
 		selectedLabel = l;
 		selectedLabel.setBackground(BCMTheme.colLightBlue);
 		selectedLabel.repaint();
 	}
 	
-
 
 	// CONSTRUCTOR
 	public FriendsListWindow() {
@@ -210,16 +205,15 @@ public class FriendsListWindow extends JFrame {
 		buildFriendListButtons(); // initiates the friends list array
 		//modeFriendsList();
 		modeLogin();
-		managerSocket = new ManagerSocket(friendListObj, username);
 	}
 
-	
 	
 	private void setWindowProperties() {
 		this.setTitle("BonChonMessenger");
 		this.setBackground(BCMTheme.colBG);
 		this.setMinimumSize(dimMinWindowSize);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(evlCloseWindow);
 		this.setBounds(100, 100, 259, 357);	
 	}
 	
@@ -267,7 +261,6 @@ public class FriendsListWindow extends JFrame {
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		cmbStatus.addItemListener(evlSignOut);
 
-
 		// STATUS COMBO BOX
 		cmbStatus.setToolTipText("Set status");
 			cmbStatus.addItem("Available");
@@ -285,15 +278,8 @@ public class FriendsListWindow extends JFrame {
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBackground(BCMTheme.colWhite);
+		
 		friendListPanel.setBorder(new EmptyBorder(3, 7, 0, 0));
-		friendListPanel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				hideContactRightClickMenu();
-				deselectLabel();
-			}
-		});
-
 		friendListPanel.setBackground(BCMTheme.colBG);
 		friendListPanel.setSize(this.getSize());
 		friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
@@ -301,7 +287,11 @@ public class FriendsListWindow extends JFrame {
 		// LISTENERS
 		mntmrAddContact.addMouseListener(evlAddContact);
 		mntmrEditContact.addMouseListener(evlEditContact);	
-		mntmrDeleteContact.addMouseListener(evlDeleteContact);	
+		mntmrDeleteContact.addMouseListener(evlDeleteContact);
+		fldUserName.addKeyListener(evlLoginFromTextField);
+		fldPassword.addKeyListener(evlLoginFromTextField);
+		friendListPanel.addMouseListener(evlPanelClick);
+
 		 
 		
 	}
@@ -398,10 +388,12 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	private void signin() {
-		imOnline = true;
-		username = fldUserName.getText();
-		lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
-		modeFriendsList();
+		if (!fldUserName.getText().trim().equals("")) {
+			imOnline = true;
+			username = fldUserName.getText();
+			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
+			modeFriendsList();
+		}
 	}
 
 	private void modeLogin() {
@@ -468,10 +460,7 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	
-	public static void main(String[] args){
-		FriendsListWindow mainWindow = new FriendsListWindow();
-		mainWindow.setVisible(true);
-	}
+	
 
 	
 	

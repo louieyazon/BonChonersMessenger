@@ -166,7 +166,7 @@ public class ChatWindow extends JFrame {
 	
 	private String getMessageBoxContents() {
 		if(!composeMessageField.getText().equals("")) {
-			String toSend = composeMessageField.getText();
+			String toSend = BCMProtocol.MESSAGE_CODE + composeMessageField.getText();
 			messageLogTextArea.append(username + ": " + toSend);
 			composeMessageField.setText("");
 			composeMessageField.grabFocus();
@@ -284,7 +284,7 @@ public class ChatWindow extends JFrame {
 	
 	private ActionListener evlSendButton = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			bridge.putMessage(BCMProtocol.MESSAGE_CODE + getMessageBoxContents());
+			bridge.putMessage(getMessageBoxContents());
 		}
 	};
 	
@@ -345,6 +345,7 @@ public class ChatWindow extends JFrame {
 	
 	private void timeToClose() {
 		//ff.cancel(false);
+		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
 		receiveSocket.cancel(false);
 		sendSocket.cancel(false);
     	this.dispose();

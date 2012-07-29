@@ -109,6 +109,19 @@ public class FriendsListWindow extends JFrame {
 			deleteFriend();
 		}
 	};
+	
+	// WINDOW CLOSER
+	private WindowAdapter evlCloseWindow = new WindowAdapter() {
+	    public void windowClosing(WindowEvent e) {
+	        timeToClose();
+	    }
+	};
+	
+	private void timeToClose() {
+    	friendListObj.saveChanges();
+    	System.out.println("Friend list saved.");
+		this.dispose();
+	}
 
 	
 	// Listener for clicks on contacts
@@ -183,7 +196,8 @@ public class FriendsListWindow extends JFrame {
 		this.setTitle("BonChonMessenger");
 		this.setBackground(BCMTheme.colBG);
 		this.setMinimumSize(dimMinWindowSize);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(evlCloseWindow);
 		this.setBounds(100, 100, 259, 357);	
 	}
 	
@@ -265,7 +279,8 @@ public class FriendsListWindow extends JFrame {
 		// LISTENERS
 		mntmrAddContact.addMouseListener(evlAddContact);
 		mntmrEditContact.addMouseListener(evlEditContact);	
-		mntmrDeleteContact.addMouseListener(evlDeleteContact);	
+		mntmrDeleteContact.addMouseListener(evlDeleteContact);
+
 		 
 		
 	}

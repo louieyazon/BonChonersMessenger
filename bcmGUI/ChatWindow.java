@@ -238,7 +238,7 @@ public class ChatWindow extends JFrame {
 			boundsholder = this.getBounds();
 			buzztime.start();
 			messageLogTextArea.append("\n BUZZ!!");
-			new bcmPlaySound("Greetings.wav").run();
+			new bcmPlaySound("Greetings.wav").start();
 		}	
 	}
 

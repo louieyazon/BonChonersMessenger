@@ -167,7 +167,7 @@ public class ChatWindow extends JFrame {
 	private String getMessageBoxContents() {
 		if(!composeMessageField.getText().equals("")) {
 			String toSend = BCMProtocol.MESSAGE_CODE + composeMessageField.getText();
-			messageLogTextArea.append(username + ": " + toSend);
+			messageLogTextArea.append("\n" + username + ": " + toSend.substring(1));
 			composeMessageField.setText("");
 			composeMessageField.grabFocus();
 			return toSend;
@@ -184,6 +184,7 @@ public class ChatWindow extends JFrame {
 	}*/
 	
 	private void sendIsTyping() {
+		bridge.putMessage(BCMProtocol.ISTYPING_CODE + "");
 		//TODO: Pass data to the thread to send the typing status
 	    // code is BCMProtocol.ISTYPING_CODE
 		
@@ -352,7 +353,13 @@ public class ChatWindow extends JFrame {
 	}
 	
 	
+	public void setReceiveSocket (ReceiveSocketSW receiveSocket){
+		this.receiveSocket = receiveSocket;
+	}
 	
+	public void setSendSocket (SendSocketSW sendSocket){
+		this.sendSocket = sendSocket;
+	}
 	
 	
 	//FAKEFRIEND

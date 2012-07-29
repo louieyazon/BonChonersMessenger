@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javax.swing.JOptionPane;
+
 import bcmBackend.Friend;
 import bcmGUI.ChatWindow;
 
@@ -24,7 +26,7 @@ public class RequestSocket extends Thread {
 	
 	public void run(){
 		String commandTyped;	
-		Socket connection;
+		Socket connection = null;
 		BufferedReader incoming;
 		PrintWriter outgoing;
 		String messageIn;
@@ -37,8 +39,13 @@ public class RequestSocket extends Thread {
 			System.out.println("SelectedFriend = null");
 		
 		try{
-			
+			//JOptionPane.showMessageDialog(null, "Connection Attempting. Please wait.");
+			try{
 			connection = new Socket(selectedFriend.getIP(), BCMProtocol.MANAGER_PORT);
+			} catch (Exception ce) {
+				JOptionPane.showMessageDialog(null, "Could not Connect.");
+				return;
+			}
 			System.out.println("Socket Built");
 			incoming = new BufferedReader( new InputStreamReader(connection.getInputStream()) );
 			outgoing = new PrintWriter(connection.getOutputStream(), true);

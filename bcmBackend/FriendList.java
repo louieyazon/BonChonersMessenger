@@ -1,4 +1,5 @@
-package bcmBackend;import java.io.*;
+package bcmBackend;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -27,7 +28,17 @@ public class FriendList {
 	public FriendList(){
 		loadFile("friends.txt");
 	}
-		
+	
+	
+	public Friend searchFriends(String ipAdd){
+	       for(Friend friend : friendArray){
+	       	    if (friend.getIP().equals(ipAdd)) return friend;
+	       }
+	    return null;
+	}
+	
+	
+	
 	private void loadFile(String filename){
 		   this.fileFriendslist = new File(filename);
 		   try {

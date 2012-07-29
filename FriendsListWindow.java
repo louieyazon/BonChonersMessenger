@@ -86,6 +86,15 @@ public class FriendsListWindow extends JFrame {
 		}
 	};
 	
+	private KeyAdapter evlLoginFromTextField = new KeyAdapter() {
+		@Override
+		public void keyPressed(KeyEvent k) {
+			if(k.getKeyCode()== KeyEvent.VK_ENTER){
+				signin();
+			}
+		}
+	};
+	
 	private MouseAdapter evlAddContact = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent me) {
@@ -110,6 +119,7 @@ public class FriendsListWindow extends JFrame {
 		}
 	};
 	
+
 	// WINDOW CLOSER
 	private WindowAdapter evlCloseWindow = new WindowAdapter() {
 	    public void windowClosing(WindowEvent e) {
@@ -158,6 +168,15 @@ public class FriendsListWindow extends JFrame {
 	};
 	
 	
+	private MouseAdapter evlPanelClick = new MouseAdapter() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			hideContactRightClickMenu();
+			deselectLabel();
+		}
+	};
+	
+	
 	private void deselectLabel() {
 		if (selectedLabel != null ) {
 			deselectLabel(selectedLabel);
@@ -168,15 +187,13 @@ public class FriendsListWindow extends JFrame {
 		l.setBackground(BCMTheme.colBG);
 		l.repaint();
 	}
-	
-	
+		
 	private void selectLabel(JLabel l) {
 		selectedLabel = l;
 		selectedLabel.setBackground(BCMTheme.colLightBlue);
 		selectedLabel.repaint();
 	}
 	
-
 
 	// CONSTRUCTOR
 	public FriendsListWindow() {
@@ -190,7 +207,6 @@ public class FriendsListWindow extends JFrame {
 		modeLogin();
 	}
 
-	
 	
 	private void setWindowProperties() {
 		this.setTitle("BonChonMessenger");
@@ -245,7 +261,6 @@ public class FriendsListWindow extends JFrame {
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		cmbStatus.addItemListener(evlSignOut);
 
-
 		// STATUS COMBO BOX
 		cmbStatus.setToolTipText("Set status");
 			cmbStatus.addItem("Available");
@@ -263,15 +278,8 @@ public class FriendsListWindow extends JFrame {
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBackground(BCMTheme.colWhite);
+		
 		friendListPanel.setBorder(new EmptyBorder(3, 7, 0, 0));
-		friendListPanel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				hideContactRightClickMenu();
-				deselectLabel();
-			}
-		});
-
 		friendListPanel.setBackground(BCMTheme.colBG);
 		friendListPanel.setSize(this.getSize());
 		friendListPanel.setLayout(new BoxLayout(friendListPanel, BoxLayout.Y_AXIS));
@@ -280,6 +288,9 @@ public class FriendsListWindow extends JFrame {
 		mntmrAddContact.addMouseListener(evlAddContact);
 		mntmrEditContact.addMouseListener(evlEditContact);	
 		mntmrDeleteContact.addMouseListener(evlDeleteContact);
+		fldUserName.addKeyListener(evlLoginFromTextField);
+		fldPassword.addKeyListener(evlLoginFromTextField);
+		friendListPanel.addMouseListener(evlPanelClick);
 
 		 
 		
@@ -377,10 +388,12 @@ public class FriendsListWindow extends JFrame {
 	}
 	
 	private void signin() {
-		imOnline = true;
-		username = fldUserName.getText();
-		lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
-		modeFriendsList();
+		if (!fldUserName.getText().trim().equals("")) {
+			imOnline = true;
+			username = fldUserName.getText();
+			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
+			modeFriendsList();
+		}
 	}
 
 	private void modeLogin() {

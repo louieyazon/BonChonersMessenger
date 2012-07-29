@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import bcmBackend.Informable;
@@ -61,5 +62,4 @@ public class SendSocketSW extends SwingWorker {
 		}
 		return null;
 	}
-	
 }

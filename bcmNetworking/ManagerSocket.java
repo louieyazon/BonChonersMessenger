@@ -121,7 +121,7 @@ public class ManagerSocket extends Thread{
 				}
 			
 			
-			ChatWindow cw = new ChatWindow(getRequestingFriend(reqIP),username,rs, ss, bridge);	
+			ChatWindow cw = new ChatWindow(getRequestingFriend(reqIP),username,rs, ss, bridge);
 			connection.setReuseAddress(true); //allow the default port to be reused after we close it
 			connection.close(); //Close the port so that we can listen again
 				

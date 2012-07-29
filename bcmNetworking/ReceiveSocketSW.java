@@ -86,6 +86,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 			
 		} catch (Exception e) {
 			System.out.println("Sorry, an error has occured. Connection lost.");
+			publish(BCMProtocol.CLOSED_CODE+"");
 			//System.exit(1);
 			return -1;
 		}

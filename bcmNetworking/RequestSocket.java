@@ -130,7 +130,7 @@ public class RequestSocket extends Thread {
 					}
 				
 			}
-			
+		//Set interactions	
 		cw.setReceiveSocket(rs);
 		cw.setSendSocket(ss);
 		cw.enableChat();

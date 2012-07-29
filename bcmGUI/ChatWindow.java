@@ -50,7 +50,7 @@ public class ChatWindow extends JFrame {
 	// MESSAGE LOG UPDATER
 		private LinkedList<String> messageBuffer = new LinkedList<String>();
 		private Timer updatetimer;
-		private int updatedelay = 500;
+		private int updatedelay = 3000;
 		
 	// BUZZ FUNCTION VARIABLES
 		private short buzzBuffer = 0;
@@ -233,7 +233,7 @@ public class ChatWindow extends JFrame {
 	// BUZZ FUNCTION
 	private void buzzWindow(){
 		if (currentBuzzFrame == 0) {
-			//new bcmPlaySound(wavfile)
+			new bcmPlaySound("Greetings.wav").run();
 			newBuzzArray();
 			boundsholder = this.getBounds();
 			buzztime.start();

@@ -40,7 +40,7 @@ public class ManagerSocket extends Thread{
 			try{
 				//Initialize Server
 				listener = new ServerSocket(port);
-				System.out.println("Listening on port" + listener.getLocalPort());
+				//System.out.println("Listening on port" + listener.getLocalPort());
 				
 				//Upon successful connection, close listener
 				connection = listener.accept();
@@ -62,7 +62,7 @@ public class ManagerSocket extends Thread{
 				if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
 					throw new Exception("Connected program is not a BCMsgr");
 				}
-				System.out.println("Handshake succesful. Now connected.");
+				//System.out.println("Handshake succesful. Now connected.");
 				
 				/*
 				 *Receive the proposed port from the RequestSocket 
@@ -72,19 +72,19 @@ public class ManagerSocket extends Thread{
 				while(true){ //The loop that handles the RequestSocket proposing & the ManagerSocket checking availability
 					
 					messageIn = incoming.readLine(); //Read the proposed port from the Request Socket
-					System.out.println("Connection requested at port " + messageIn);
+					//System.out.println("Connection requested at port " + messageIn);
 					proposedPort = Integer.parseInt(messageIn);//Translate the proposed port into an integer
 					
 					if(portAvailable(proposedPort)){ //If the port is available
 						
-						System.out.print("Proposed port good. Building ReceiveSocket and waiting of Requester...");
+						//System.out.print("Proposed port good. Building ReceiveSocket and waiting of Requester...");
 						rs = new ReceiveSocketSW(proposedPort); //Build the ReceiveSocket on the Manager side
 						
 						outgoing.println("available"); //Inform Requester that socket is Available
 						
 						messageIn = incoming.readLine(); //Wait for the message from the Requester to connect to our ReceieveSocket
 						
-						System.out.println("Requester says " + messageIn);
+						//System.out.println("Requester says " + messageIn);
 						
 						break;
 					} else { //If the port is not available
@@ -100,14 +100,14 @@ public class ManagerSocket extends Thread{
 				 */
 				while(true){
 					messageIn = incoming.readLine(); //Read the proposed port
-					System.out.println("Connection requested at port " + messageIn);				
+					//System.out.println("Connection requested at port " + messageIn);				
 					proposedPort = Integer.parseInt(messageIn); //Translate the proposed port into an integer
 					
 					if(portAvailable(proposedPort)){
 						outgoing.println("available"); //Inform Requester that socket is available
-						System.out.print("Proposed port good. Waiting for requester to build ReceiveSocket...");
+						//System.out.print("Proposed port good. Waiting for requester to build ReceiveSocket...");
 						messageIn = incoming.readLine(); //Receive ready message from Requester
-						System.out.println("Requester says: " + messageIn);
+						//System.out.println("Requester says: " + messageIn);
 						
 						reqIP = messageIn;//retrieve the IP address of the Requester
 						reqIP = reqIP.substring(1);// Remove the "\" in the address
@@ -127,8 +127,8 @@ public class ManagerSocket extends Thread{
 			connection.close(); //Close the port so that we can listen again
 				
 			} catch (Exception e) {
-				System.out.println("An error occured while opening the connection.");
-				System.out.println(e.toString());
+				//System.out.println("An error occured while opening the connection.");
+				//System.out.println(e.toString());
 				return;
 			}	
 		}
@@ -159,11 +159,11 @@ public class ManagerSocket extends Thread{
 			ss.setReuseAddress(true);
 			
 			
-			System.out.println("portAvailable says true");
+			//System.out.println("portAvailable says true");
 			
 			return true;
 		}catch (Exception e) {
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
 		} finally {
 			if(ss != null){
 				try{
@@ -174,7 +174,7 @@ public class ManagerSocket extends Thread{
 				
 			}
 		} 
-		System.out.println("portAvailable says false");
+		//System.out.println("portAvailable says false");
 		return false;
 	}
 	

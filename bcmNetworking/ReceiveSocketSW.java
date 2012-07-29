@@ -34,7 +34,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 		try{
 			//Initialize Server
 			listener = new ServerSocket(port);
-			System.out.println("Listening on port" + listener.getLocalPort());
+//			System.out.println("Listening on port" + listener.getLocalPort());
 			//Upon successful connection, close listener
 			connection = listener.accept();
 			listener.close();
@@ -54,11 +54,11 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 			if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
 				throw new Exception("Connected program is not a BCMsgr");
 			}
-			System.out.println("Connected.");
+	//		System.out.println("Connected.");
 			
 		} catch (Exception e) {
-			System.out.println("An error occured while opening the connection.");
-			System.out.println(e.toString());
+		//	System.out.println("An error occured while opening the connection.");
+			//System.out.println(e.toString());
 			return -1;
 		}
 		
@@ -69,7 +69,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 				messageIn = incoming.readLine();
 				
 				if(messageIn.length() > 0) {
-					System.out.println(messageIn);
+				//	System.out.println(messageIn);
 					if(endNow)
 						return 0;
 					publish(messageIn);
@@ -87,7 +87,7 @@ public class ReceiveSocketSW extends SwingWorker<Integer, String>{
 			
 			
 		} catch (Exception e) {
-			System.out.println("Sorry, an error has occured. Connection lost.");
+	//		System.out.println("Sorry, an error has occured. Connection lost.");
 			return -1;
 		}
 		return 0;

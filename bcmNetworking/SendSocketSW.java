@@ -48,7 +48,7 @@ public class SendSocketSW extends SwingWorker {
 			if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
 				throw new Exception("Connected program is not a BCMsgr");
 			}
-			System.out.println("Connected.");
+//			System.out.println("Connected.");
 			
 			
 			while(!endNow) {
@@ -63,7 +63,7 @@ public class SendSocketSW extends SwingWorker {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error: " + e);
+	//		System.out.println("Error: " + e);
 		}
 		return null;
 	}

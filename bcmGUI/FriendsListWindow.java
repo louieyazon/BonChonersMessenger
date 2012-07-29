@@ -170,7 +170,7 @@ public class FriendsListWindow extends JFrame {
 	
 	private void timeToClose() {
     	friendListObj.saveChanges();
-    	System.out.println("Friend list saved.");
+//    	System.out.println("Friend list saved.");
 		System.exit(0);
 	}
 
@@ -378,18 +378,18 @@ public class FriendsListWindow extends JFrame {
 		if (selectedFriend.isEmpty() == true) {
 			friendListObj.getList().remove(selectedFriend);
 			selectedFriend = null;
-			System.out.println("friend add canceled");
+	//		System.out.println("friend add canceled");
 		} else {
 			wipeFriendListButtons();
 			buildFriendListButtons();
-			System.out.println("friend added");
+	//		System.out.println("friend added");
 			scrollPane.revalidate();
 		}
 	}
 	
 	
 	private void editFriend() {
-		new AddFriendDialog(selectedFriend);
+	new AddFriendDialog(selectedFriend);
 		refreshFriendList();
 	}
 	
@@ -457,7 +457,7 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	private void showContactRightClickMenu() {
-		System.out.println("right clicked");
+		//System.out.println("right clicked");
 		mnuRightClickContact.setLocation(getMousePosition().x + this.getLocation().x, getMousePosition().y + this.getLocation().y);
 		mnuRightClickContact.setVisible(true);
 	}

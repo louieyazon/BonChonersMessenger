@@ -52,17 +52,8 @@ public class SendSocketSW extends SwingWorker {
 			while(!isCancelled()) {
 				//System.out.print("> ");
 				messageTyped = bridge.getMessage();
-				char prependCode;
-				if(messageTyped.equalsIgnoreCase("quit")) {
-					prependCode = BCMProtocol.CLOSED_CODE;
-				} else if (messageTyped.equalsIgnoreCase("buzz")){
-					prependCode = BCMProtocol.BUZZ_CODE;
-				}
-				else {
-					prependCode = BCMProtocol.MESSAGE_CODE;
-				}
 				
-				outgoing.println(prependCode + messageTyped);
+				outgoing.println(messageTyped);
 			}
 
 		} catch (Exception e) {

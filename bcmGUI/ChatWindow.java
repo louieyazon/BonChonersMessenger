@@ -190,7 +190,7 @@ public class ChatWindow extends JFrame {
 	}
 	
 	private void sendBuzz() {
-		bridge.putMessage("buzz");
+		bridge.putMessage(BCMProtocol.BUZZ_CODE + "");
 		//TODO: Pass data to the thread to send a buzz
 		// code is BCMProtocol.BUZZ_CODE
 		
@@ -284,7 +284,7 @@ public class ChatWindow extends JFrame {
 	
 	private ActionListener evlSendButton = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			bridge.putMessage(getMessageBoxContents());
+			bridge.putMessage(BCMProtocol.MESSAGE_CODE + getMessageBoxContents());
 		}
 	};
 	

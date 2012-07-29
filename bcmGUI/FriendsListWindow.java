@@ -80,6 +80,8 @@ public class FriendsListWindow extends JFrame {
 	private Friend selectedFriend; 
 	private FriendList friendListObj = new FriendList();
 	private LinkedList<JLabel> friendLabel = new LinkedList<JLabel>();
+	private LinkedList<String> connectedIPs = new LinkedList<String>();
+	
 	private JLabel selectedLabel;
 
 	// VALUES
@@ -170,7 +172,7 @@ public class FriendsListWindow extends JFrame {
 	
 	private void timeToClose() {
     	friendListObj.saveChanges();
-//    	System.out.println("Friend list saved.");
+    	System.out.println("Friend list saved.");
 		System.exit(0);
 	}
 
@@ -199,14 +201,19 @@ public class FriendsListWindow extends JFrame {
 				
 				// DOUBLE CLICK OPENS CHAT WIDOW
 				if (me.getClickCount() == 2) {
-					try { new RequestSocket(selectedFriend, username); }
-					catch (Exception e) { e.printStackTrace(); }
+					//TODO: Add condition if (selected friend's IP is not in connectedIPs)
+						connectedIPs.add(selectedFriend.getIP());
+						try { new RequestSocket(selectedFriend, username); }
+						catch (Exception e) { e.printStackTrace(); }
+					
 				}
 				
 			}
 		}
 		
 	};
+	
+	//TODO: search function for connectedIPs. returns string or null.
 	
 	
 	private MouseAdapter evlPanelClick = new MouseAdapter() {
@@ -378,18 +385,18 @@ public class FriendsListWindow extends JFrame {
 		if (selectedFriend.isEmpty() == true) {
 			friendListObj.getList().remove(selectedFriend);
 			selectedFriend = null;
-	//		System.out.println("friend add canceled");
+			System.out.println("friend add canceled");
 		} else {
 			wipeFriendListButtons();
 			buildFriendListButtons();
-	//		System.out.println("friend added");
+			System.out.println("friend added");
 			scrollPane.revalidate();
 		}
 	}
 	
 	
 	private void editFriend() {
-	new AddFriendDialog(selectedFriend);
+		new AddFriendDialog(selectedFriend);
 		refreshFriendList();
 	}
 	
@@ -441,7 +448,7 @@ public class FriendsListWindow extends JFrame {
 			username = fldUserName.getText();
 			lblMessengerStatus.setText(BCMTheme.statusText(BCMTheme.STATUS_SIGNEDIN, username)); 
 			modeFriendsList();
-			managerSocket = new ManagerSocket(friendListObj, username);
+			managerSocket = new ManagerSocket(friendListObj, username, connectedIPs);
 		}
 	}
 
@@ -457,7 +464,7 @@ public class FriendsListWindow extends JFrame {
 	
 	
 	private void showContactRightClickMenu() {
-		//System.out.println("right clicked");
+		System.out.println("right clicked");
 		mnuRightClickContact.setLocation(getMousePosition().x + this.getLocation().x, getMousePosition().y + this.getLocation().y);
 		mnuRightClickContact.setVisible(true);
 	}

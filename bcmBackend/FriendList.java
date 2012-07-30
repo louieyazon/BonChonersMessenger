@@ -90,14 +90,15 @@ public class FriendList {
 	   
 	   public void saveChanges() {
 		   try {
-			   saveFile("friends.txt");
+			   saveFile();
 		   } catch (FileNotFoundException e) {
 			   e.printStackTrace();
 		   } catch (IOException e) {
 			   e.printStackTrace();
 		   }
-
 	   }
+	   
+	   
 	   
 	
 	   public void saveFile(String filename) throws FileNotFoundException, IOException {
@@ -110,8 +111,20 @@ public class FriendList {
 		   } finally {
 			   fileSaver.close();
 		   }
+	   }
+	   
+	   public void saveFile() throws FileNotFoundException, IOException {
+		   String stringToSave = FriendArrayToExportString();
+		   Writer fileSaver = new BufferedWriter(new FileWriter(this.fileFriendslist));
+
+		   try {
+			   fileSaver.write(stringToSave.toString());
+		   } finally {
+			   fileSaver.close();
+		   }
 
 	   }
+	   
 
 
 	   private void setSaveFile(String filename) throws IOException{

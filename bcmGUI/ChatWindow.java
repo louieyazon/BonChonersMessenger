@@ -67,12 +67,16 @@ public class ChatWindow extends JFrame {
 	private String getMessageBoxContents() {
 		if(!composeMessageField.getText().equals("")) {
 			String toSend = BCMProtocol.MESSAGE_CODE + composeMessageField.getText();
-			messageLogTextArea.append("\n" + username + ": " + toSend.substring(1));
+			messageLogTextArea.append(   BCMTheme.chatMessage(username, toSend.substring(1))   );
 			composeMessageField.setText("");
 			composeMessageField.grabFocus();
 			return toSend;
 		}
 		return "";
+	}
+	
+	private void sendMessageBoxContents() {
+		bridge.putMessage(getMessageBoxContents());
 	}
 	
 	private void sendIsTyping() {
@@ -144,18 +148,20 @@ public class ChatWindow extends JFrame {
 			if(plssendistyping == false) plssendistyping = true;
 			
 			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-				bridge.putMessage(getMessageBoxContents());
+				sendMessageBoxContents();
 			}
 			
 			if (k.getKeyCode() == KeyEvent.VK_B && k.getModifiers() == KeyEvent.VK_CONTROL) {
 				buzzWindow();
 			}
 		}
+
+
 	};
 	
 	private ActionListener evlSendButton = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			bridge.putMessage(getMessageBoxContents());
+			sendMessageBoxContents();
 		}
 	};
 	
@@ -184,6 +190,9 @@ public class ChatWindow extends JFrame {
 			}
 		}
 	};
+	
+	
+	
 	
 	//XXX INCOMING MESSAGE PARSING
 	private void parseIncomingMessage(String currMessage) {
@@ -224,6 +233,11 @@ public class ChatWindow extends JFrame {
 	        timeToClose();
 	    }
 	};
+	
+	private AdjustmentListener evlAutoscroller = new AdjustmentListener(){
+		public void adjustmentValueChanged(AdjustmentEvent e){
+		messageLogTextArea.select(messageLogTextArea.getHeight()+1000,0);
+		}};
 	
 	
 	//XXX Networking
@@ -277,6 +291,8 @@ public class ChatWindow extends JFrame {
 		
 		// MESSAGE LOG AREA
 		scrlpnMsgLogArea.setAutoscrolls(true);
+		scrlpnMsgLogArea.getVerticalScrollBar().addAdjustmentListener(evlAutoscroller);
+		
 		messageLogTextArea.setEditable(false);
 		messageLogTextArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
 		messageLogTextArea.setRows(10);

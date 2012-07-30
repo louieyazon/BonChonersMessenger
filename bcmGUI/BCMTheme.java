@@ -68,10 +68,16 @@ public class BCMTheme {
 		return (fr.getNickname() + " is typing");
 	}
 	
-	public static String chatMessage(Friend fr, String msg) {
-		return ("\n" + fr.getNickname() + ": " + msg);
+	public static String chatMessage(String sender, String msg){
+		return ("\n<" + sender + "> " + msg);
 	}
 	
+	public static String chatMessage(Friend fr, String msg) {
+		return chatMessage(fr.getNickname(), msg);
+	}
+	
+	
+	//XXX SOUNDS
 	public static void playBuzz() {
 		playSound("buzz.wav");
 	}

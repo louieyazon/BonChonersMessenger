@@ -2,18 +2,10 @@ package bcmGUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.regex.Pattern;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import bcmBackend.Friend;
@@ -35,6 +27,9 @@ public class AddFriendDialog extends JDialog {
 	private FriendDataField tfIPAddress = new FriendDataField();
 	private Friend currentFriend;
 	
+	private Timer updatetimer;
+	private int updatedelay = 500;
+	
 	
 	//COMPONENTS
 	JPanel pnlFriendFields = new JPanel();
@@ -51,27 +46,22 @@ public class AddFriendDialog extends JDialog {
 	private KeyAdapter evlTypingInField = new KeyAdapter() {
 		@Override
 		public void keyPressed(KeyEvent k) {
-			
-			
 			FriendDataField currentField = (FriendDataField)k.getSource();
 			
-			if (currentField.getName() == "IPField") {
-				currentField.reflectIPError();
-			} else {
-				currentField.reflectError();
-			}
+			if (currentField.getName() == "IPField") {		currentField.reflectIPError();	} 
+			else 									 {		currentField.reflectError();	}
 			
-			
-			
-			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
-				saveChanges();
-			}
-			
-			if (k.getKeyCode() == KeyEvent.VK_ESCAPE) { 
-				cancelChanges();
-			}
-			
-			
+			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 		saveChanges();					}
+			if (k.getKeyCode() == KeyEvent.VK_ESCAPE){		cancelChanges();				}
+		}
+	};
+	
+	
+	private ActionListener evlChecker = new ActionListener(){
+		public void actionPerformed(ActionEvent ae) {
+			tfNickname.reflectError();
+			tfUserName.reflectError();
+			tfIPAddress.reflectIPError();
 		}
 	};
 	
@@ -84,7 +74,6 @@ public class AddFriendDialog extends JDialog {
 		lblUsername.setDisplayedMnemonic('U');
 		lblUsername.setLabelFor(tfUserName);
 		tfIPAddress.setName("IPField");
-		
 		addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent k) {
@@ -93,25 +82,15 @@ public class AddFriendDialog extends JDialog {
 				}
 			}
 		});
-		
-		
-		
 		setComponentProperties();
-		
 		currentFriend = cF;
-
-		
 		if (!currentFriend.isEmpty()) {
-			
 			this.setTitle("Editing " + currentFriend.getNickname());
 			tfUserName.setText(currentFriend.getUsername());
 			tfNickname.setText(currentFriend.getNickname());
 			tfIPAddress.setText(currentFriend.getIP());
-
-			
 		} else {
 			this.setTitle("New Friend");
-			
 		}
 		this.setVisible(true);
 	}
@@ -128,6 +107,8 @@ public class AddFriendDialog extends JDialog {
 		this.getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+		updatetimer = new Timer(updatedelay, evlChecker);
+		updatetimer.start();
 		
 		
 			

@@ -345,7 +345,7 @@ public class ChatWindow extends JFrame {
 		private int updatedelay = 3000;
 		
 		private Timer istypingsender;
-		private int istypingsenddelay = 500;
+		private int istypingsenddelay = 1500;
 		private boolean plssendistyping = false;
 			
 		// BUZZ FUNCTION VARIABLES

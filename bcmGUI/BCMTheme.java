@@ -22,12 +22,16 @@ public class BCMTheme {
 	public static int strutHeight = 5;
 	public static Dimension dimButtonSize = new Dimension(200, 25);
 	public static int loginFieldWidth = 15;
-	public static int icongap = 10;
+	public static int icongap = 6;
 	
 	public static Cursor FRIEND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
-	public static ImageIcon CONTACT_ICON = new ImageIcon("favatar.png");
-	public static Image CHAT_ICON = Toolkit.getDefaultToolkit().getImage("chatico.png");
+	public static ImageIcon CONTACT_ICON = new ImageIcon("bcmchaticon.png");
+	public static ImageIcon MESSENGER_LOGO = new ImageIcon("BCMLogo.png");
+	public static ImageIcon MESSENGER_LOGO_BIG = new ImageIcon("BCMLogoAbout.png");
+	public static Image CHAT_ICON = Toolkit.getDefaultToolkit().getImage("bcmicon.png");
+	public static Image CLIENT_ICON = Toolkit.getDefaultToolkit().getImage("bcmicon.png");
 	public static ImageIcon MESSENGER_ICON = new ImageIcon("fb.ico");
+	public static ImageIcon TROLOLOL = new ImageIcon("trollol.gif");
 	
 	public static int STATUS_SIGNEDIN = 1;
 	

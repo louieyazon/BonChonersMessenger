@@ -222,6 +222,7 @@ public class FriendsListWindow extends JFrame {
 		this.setTitle("BonChonMessenger");
 		this.setBackground(BCMTheme.colBG);
 		this.setMinimumSize(dimMinWindowSize);
+		this.setIconImage(BCMTheme.CLIENT_ICON);
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(evlCloseWindow);
 		this.setBounds(100, 100, 259, 357);	
@@ -237,8 +238,12 @@ public class FriendsListWindow extends JFrame {
 
 		// FIELDS AND BUTTON
 		lblUsername.setAlignmentX(Component.CENTER_ALIGNMENT);
-		fldUserName.setText("userad");
+		fldUserName.setText("");
 		fldUserName.setColumns(BCMTheme.loginFieldWidth);
+		
+		lbliClientImage.setPreferredSize(new Dimension(150, 150));
+		lbliClientImage.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+		lbliClientImage.setIcon(BCMTheme.MESSENGER_LOGO);
 		
 		btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnLogin.addMouseListener(evlSignIn);
@@ -323,6 +328,15 @@ public class FriendsListWindow extends JFrame {
 			mnMessenger.add(mntmSignOut);
 			mnMessenger.add(mntmImportFriends);
 			mnMessenger.add(mntmExit);
+			
+			menuBar.add(mnHelp);
+			mntmAbout.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					new AboutDialog();
+				}
+			});
+			
+			mnHelp.add(mntmAbout);
 		
 		//STATUS BAR
 		tbStatusBar.setFloatable(false);
@@ -557,6 +571,8 @@ public class FriendsListWindow extends JFrame {
 			deselectLabel();
 		}
 	};	
+	private final JMenu mnHelp = new JMenu("Help");
+	private final JMenuItem mntmAbout = new JMenuItem("About...");
 	
 	
 

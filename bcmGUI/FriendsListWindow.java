@@ -154,7 +154,6 @@ public class FriendsListWindow extends JFrame {
 	private void buildFriendListButtons() {
 		JLabel currentLabel;
 		Friend currentFriend;
-		
 		// traverse through all friends in friendListObj
 		// generate JLabels for each
 		for (int i = 0; i < friendListObj.getList().size(); i++) {
@@ -162,7 +161,6 @@ public class FriendsListWindow extends JFrame {
 			
 			currentLabel = new JLabel(currentFriend.getNickname());
 			currentLabel.setOpaque(true);
-			
 			currentLabel.setBackground(BCMTheme.colBG);
 			currentLabel.setIcon(BCMTheme.CONTACT_ICON);
 			currentLabel.setIconTextGap(BCMTheme.icongap);

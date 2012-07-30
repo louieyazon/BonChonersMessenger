@@ -42,7 +42,6 @@ public class ChatWindow extends JFrame {
 		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
 		if (receiveSocket != null) receiveSocket.end();
 		if (sendSocket != null)    sendSocket.end();
-		//FIXME what if chatmate is null? Is chatmate ever null?
 		connectedIPs.removeIP(chatmate.getIP());		//removeIP has internal checking if it exists 
     	this.dispose();
 	}
@@ -142,8 +141,7 @@ public class ChatWindow extends JFrame {
 		@Override
 		public void keyPressed(KeyEvent k) {
 			
-			if(plssendistyping == false) plssendistyping = true; 
-			sendIsTyping();
+			if(plssendistyping == false) plssendistyping = true;
 			
 			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
 				bridge.putMessage(getMessageBoxContents());
@@ -235,22 +233,7 @@ public class ChatWindow extends JFrame {
 	
 	public void setSendSocket (SendSocketSW sendSocket){
 		this.sendSocket = sendSocket;
-	}
-	
-	//FAKEFRIEND
-	/*private void connectToFakeFriend() {
-		if (ff == null) {
-				//TO START A NEW SWINGWORKER THREAD
-		        SwingUtilities.invokeLater(new Runnable() {
-		            public void run() {
-		            	ff = new FakeFriend(messageBuffer);
-		            	ff.execute();
-		            }
-		        });
-		       //TO START A NEW THREAD
-		}
-	}*/
-	
+	}	
 	
 	//XXX SET COMPONENT PROPERTIES
 	private void setComponentHierarchy() {

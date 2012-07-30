@@ -44,7 +44,7 @@ public class RequestSocket extends Thread {
 			connection = new Socket(selectedFriend.getIP(), BCMProtocol.MANAGER_PORT);
 			} catch (Exception ce) {
 				//System.out.println(ce.toString());
-				cw.dispose();
+				cw.timeToClose();
 				JOptionPane.showMessageDialog(null, "Could not Connect.");
 				return;
 			}

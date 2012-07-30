@@ -23,6 +23,18 @@ public class FriendList {
 		return currentFriend;
 	}
 	
+	public void importFile(File importedfile){
+		saveChanges();
+		friendArray = new ArrayList<Friend>();		//this line replaces the current list instead of appending the new file
+		
+		this.fileFriendslist = importedfile;
+		try {
+			processFile();
+		} catch(FileNotFoundException e){
+			System.out.println("File not found.");
+		}
+	}
+	
 	
 	//CONSTRUCTOR
 	public FriendList(){

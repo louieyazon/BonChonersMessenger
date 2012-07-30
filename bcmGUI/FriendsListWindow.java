@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -72,8 +73,12 @@ public class FriendsListWindow extends JFrame {
 		if (  connectedIPs.find(selectedFriend.getIP()) == null  ) {		// reject double chat window
 			System.out.println("trying to connect");
 			connectedIPs.add(selectedFriend.getIP());
+			System.out.println(connectedIPs);
 			try { new RequestSocket(selectedFriend, username, connectedIPs); }
-			catch (Exception e) { e.printStackTrace(); }
+			catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(connectedIPs);
+			}
 		}
 	}
 	
@@ -113,13 +118,29 @@ public class FriendsListWindow extends JFrame {
 		
 		if (trulyDelete == JOptionPane.OK_OPTION)
 		{	friendListObj.getList().remove(selectedFriend);
-			selectedFriend = null;
-			wipeFriendListButtons();
-			buildFriendListButtons();
-			scrollPane.revalidate();
+			refreshFriendListLabels();
 			friendListObj.saveChanges();
 		} 
 	}
+
+	private void refreshFriendListLabels() {
+		selectedFriend = null;
+		wipeFriendListButtons();
+		buildFriendListButtons();
+		scrollPane.revalidate();
+	}
+	
+	private void importFriendsList() {
+		int chosenOption = fchooser.showOpenDialog(this);
+        if (chosenOption == JFileChooser.APPROVE_OPTION) {
+            File importedFile = fchooser.getSelectedFile();
+            friendListObj.importFile(importedFile);
+            
+            refreshFriendListLabels();
+        } 
+	}
+	
+	
 
 	
 	
@@ -349,6 +370,7 @@ public class FriendsListWindow extends JFrame {
 	private JPanel pnlLogin = new JPanel();
 	private JPanel pnlMainFriends = new JPanel();
 	private final JPanel pnlProg = new JPanel();
+	final JFileChooser fchooser = new JFileChooser();
 	
 	// LOGIN PANEL
 	private JPanel pnlLoginFields = new JPanel();
@@ -418,8 +440,7 @@ public class FriendsListWindow extends JFrame {
 	
 	private ActionListener evlImportFriends = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-			//TODO JFileChooser for picking txt file for import
-			
+			importFriendsList();
 		}
 	};
 	

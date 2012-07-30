@@ -38,7 +38,7 @@ public class ChatWindow extends JFrame {
 		enableChat();
 	}
 	
-	private void timeToClose() {
+	public void timeToClose() {
 		bridge.putMessage(BCMProtocol.CLOSED_CODE+ "");
 		if (receiveSocket != null) receiveSocket.end();
 		if (sendSocket != null)    sendSocket.end();

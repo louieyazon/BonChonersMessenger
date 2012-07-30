@@ -38,6 +38,7 @@ public class FriendsListWindow extends JFrame {
 			managerSocket = new ManagerSocket(friendListObj, username, connectedIPs);
 			modeFriendsList();
 			imOnline = true;
+			BCMTheme.playLogin();
 		}
 	}
 	
@@ -138,11 +139,7 @@ public class FriendsListWindow extends JFrame {
             
             refreshFriendListLabels();
         } 
-	}
-	
-	
-
-	
+	}	
 	
 	private void showContactRightClickMenu() {
 		System.out.println("right clicked");

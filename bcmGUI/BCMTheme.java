@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 import bcmBackend.Friend;
+import bcmBackend.bcmPlaySound;
 
 
 public class BCMTheme {
@@ -30,15 +31,14 @@ public class BCMTheme {
 	public static ImageIcon MESSENGER_LOGO_BIG = new ImageIcon("BCMLogoAbout.png");
 	public static Image CHAT_ICON = Toolkit.getDefaultToolkit().getImage("bcmicon.png");
 	public static Image CLIENT_ICON = Toolkit.getDefaultToolkit().getImage("bcmicon.png");
-	public static ImageIcon MESSENGER_ICON = new ImageIcon("fb.ico");
 	public static ImageIcon TROLOLOL = new ImageIcon("trollol.gif");
 	
 	public static int STATUS_SIGNEDIN = 1;
 	
 	// BUZZ CONSTANTS
-	public static short MAX_BUZZ_FRAMES = 9;
-	public static int BUZZ_TIMER_DELAY = 34;  // 33.333ms per frame is 30fps
-	public static  int MAX_BUZZ_MAGNITUDE = 30;
+	public static short MAX_BUZZ_FRAMES    = 9;
+	public static int   BUZZ_TIMER_DELAY   = 34;  // 33.333ms per frame is 30fps
+	public static int   MAX_BUZZ_MAGNITUDE = 30;
 	
 	
 	// MESSAGES
@@ -70,6 +70,26 @@ public class BCMTheme {
 	
 	public static String chatMessage(Friend fr, String msg) {
 		return ("\n" + fr.getNickname() + ": " + msg);
+	}
+	
+	public static void playBuzz() {
+		playSound("buzz.wav");
+	}
+	
+	public static void playMessage() {
+		playSound("message.wav");
+	}
+	
+	public static void playNewChat() {
+		playSound("newchat.wav");
+	}
+	
+	public static  void playLogin() {
+		playSound("login.wav");
+	}
+	
+	public static void playSound(String filename) {
+		new bcmPlaySound(filename).start();
 	}
 	
 }

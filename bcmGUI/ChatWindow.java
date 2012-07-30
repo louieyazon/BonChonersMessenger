@@ -58,6 +58,7 @@ public class ChatWindow extends JFrame {
 		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
 		updatetimer.start();
 		istypingsender.start();
+		BCMTheme.playNewChat();
 		
 	}
 	
@@ -89,12 +90,11 @@ public class ChatWindow extends JFrame {
 	//XXX BUZZ FUNCTION
 	private void buzzWindow(){
 		if (currentBuzzFrame == 0) {
-			
 			newBuzzArray();
 			boundsholder = this.getBounds();
 			buzztime.start();
 			messageLogTextArea.append("\n BUZZ!!");
-			new bcmPlaySound("Greetings.wav").start();
+			BCMTheme.playBuzz();
 		}	
 	}
 
@@ -191,6 +191,7 @@ public class ChatWindow extends JFrame {
 			code = currMessage.charAt(0);
 			if(code == BCMProtocol.MESSAGE_CODE) {
 				messageLogTextArea.append(  BCMTheme.chatMessage(chatmate, currMessage.substring(1))  );
+				BCMTheme.playMessage();
 				showNotTyping();
 			}
 			else if (code == BCMProtocol.CLOSED_CODE) {

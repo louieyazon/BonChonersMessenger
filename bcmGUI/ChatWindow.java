@@ -58,6 +58,7 @@ public class ChatWindow extends JFrame {
 		lblActivityLabel.setText("");
 		messageLogTextArea.append("Now chatting with " + chatmate.getNickname() + "\n");
 		updatetimer.start();
+		istypingsender.start();
 		
 	}
 	
@@ -141,6 +142,7 @@ public class ChatWindow extends JFrame {
 		@Override
 		public void keyPressed(KeyEvent k) {
 			
+			if(plssendistyping == false) plssendistyping = true; 
 			sendIsTyping();
 			
 			if (k.getKeyCode() == KeyEvent.VK_ENTER) { 
@@ -173,6 +175,15 @@ public class ChatWindow extends JFrame {
 	private ActionListener evlUpdater = new ActionListener(){
 		public void actionPerformed(ActionEvent arg0){
 			showNotTyping();
+		}
+	};
+	
+	private ActionListener evlIsTypingSender = new ActionListener(){
+		public void actionPerformed(ActionEvent ae) {
+			if(plssendistyping) {
+				sendIsTyping();
+				plssendistyping = false;
+			}
 		}
 	};
 	
@@ -292,6 +303,7 @@ public class ChatWindow extends JFrame {
 		//MESSAGE LOG UPDATER TIMER
 		updatetimer = new Timer(updatedelay, evlUpdater);
 		updatetimer.setRepeats(true);
+		istypingsender = new Timer(istypingsenddelay, evlIsTypingSender);
 		
 		//ASSIGN LISTENERS
 		composeMessageField.addKeyListener(evlmsgField);
@@ -343,9 +355,15 @@ public class ChatWindow extends JFrame {
 			} );
 		}
 		
+		
+		
 		// ISTYPING REFRESHER
 		private Timer updatetimer;
 		private int updatedelay = 3000;
+		
+		private Timer istypingsender;
+		private int istypingsenddelay = 500;
+		private boolean plssendistyping = false;
 			
 		// BUZZ FUNCTION VARIABLES
 			private short buzzBuffer = 0;

@@ -65,7 +65,7 @@ public class BCMTheme {
 	}
 	
 	public static String isTypingMessage(Friend fr) {
-		return (fr.getNickname() + "is typing");
+		return (fr.getNickname() + " is typing");
 	}
 	
 	public static String chatMessage(Friend fr, String msg) {

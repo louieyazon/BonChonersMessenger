@@ -1,15 +1,11 @@
 package bcmNetworking;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import bcmBackend.Friend;
-import bcmBackend.FriendList;
+import bcmBackend.*;
 import bcmGUI.ChatWindow;
 
 public class ManagerSocket extends Thread{
@@ -18,11 +14,12 @@ public class ManagerSocket extends Thread{
 	private FriendList friendList;
 	private String username;
 	private boolean stopped;
-	private LinkedList<String> connectedIPs;
+	private IPList connectedIPs;
 	
-	public ManagerSocket(FriendList friendList, String username, LinkedList<String> connectedIPs){
+	public ManagerSocket(FriendList friendList, String username, IPList cip){
 		this.friendList = friendList;
 		this.username = username;
+		this.connectedIPs = cip;
 		this.start();
 	}
 	
@@ -39,7 +36,7 @@ public class ManagerSocket extends Thread{
 		int proposedPort;
 		Bridge bridge;
 		
-		while(!stopped) { //Perpetually listen for incoming connections, but allowing only one build at a time
+		while(!stopped) {						 //Perpetually listen for incoming connections, but allowing only one build at a time
 			try{
 				//Initialize Server
 				listener = new ServerSocket(port);
@@ -66,15 +63,20 @@ public class ManagerSocket extends Thread{
 				if(! BCMProtocol.HANDSHAKE.equals(messageIn)){
 					throw new Exception("Connected program is not a BCMsgr");
 				}
-				//System.out.println("Handshake succesful. Now connected.");
+				//System.out.println("Handshake successful. Now connected.");
 				
-				messageIn = incoming.readLine();
-				for(String connectedIP : connectedIPs){
-					if(connectedIP.equalsIgnoreCase(messageIn))
-						outgoing.println("disallowed");
+				messageIn = incoming.readLine(); // Read the IP sent by the RequestSocket
+				
+				System.out.println("now printing connected IPs");
+				for(String IP : connectedIPs){
+					System.out.println(IP);
+				}
+				if(connectedIPs.find(messageIn)!=null) {
+						outgoing.println(BCMProtocol.CONNECTION_DISALLOWED);
 						throw new Exception("IP attempting double connection.");
 				}
-				outgoing.println("approved");
+				
+				outgoing.println(BCMProtocol.CONNECTION_APPROVED);
 				/*
 				 *Receive the proposed port from the RequestSocket 
 				 *Check if it is available, and if so, create the
@@ -91,15 +93,15 @@ public class ManagerSocket extends Thread{
 						//System.out.print("Proposed port good. Building ReceiveSocket and waiting of Requester...");
 						rs = new ReceiveSocketSW(proposedPort); //Build the ReceiveSocket on the Manager side
 						
-						outgoing.println("available"); //Inform Requester that socket is Available
+						outgoing.println(BCMProtocol.PORT_AVAILABLE); //Inform Requester that socket is Available
 						
 						messageIn = incoming.readLine(); //Wait for the message from the Requester to connect to our ReceieveSocket
 						
 						//System.out.println("Requester says " + messageIn);
 						
 						break;
-					} else { //If the port is not available
-						outgoing.println("not available");
+					} else { 									//If the port is not available
+						outgoing.println(BCMProtocol.PORT_UNAVAILABLE);
 					}	
 				}
 				
@@ -115,7 +117,7 @@ public class ManagerSocket extends Thread{
 					proposedPort = Integer.parseInt(messageIn); //Translate the proposed port into an integer
 					
 					if(portAvailable(proposedPort)){
-						outgoing.println("available"); //Inform Requester that socket is available
+						outgoing.println(BCMProtocol.PORT_AVAILABLE); //Inform Requester that socket is available
 						//System.out.print("Proposed port good. Waiting for requester to build ReceiveSocket...");
 						messageIn = incoming.readLine(); //Receive ready message from Requester
 						//System.out.println("Requester says: " + messageIn);
@@ -128,18 +130,18 @@ public class ManagerSocket extends Thread{
 
 						break;
 					} else { //If the current port is not available
-						outgoing.println("not available");
+						outgoing.println(BCMProtocol.PORT_UNAVAILABLE);
 					}
 				}
 			
-			
-			ChatWindow cw = new ChatWindow(getRequestingFriend(reqIP),username,rs, ss, bridge);
-			connection.setReuseAddress(true); //allow the default port to be reused after we close it
-			connection.close(); //Close the port so that we can listen again
+			connectedIPs.add(reqIP);
+			ChatWindow cw = new ChatWindow(getRequestingFriend(reqIP), username, rs, ss, bridge, connectedIPs);
+			connection.setReuseAddress(true); 		// allow the default port to be reused after we close it
+			connection.close();						// Close the port so that we can listen again
 				
 			} catch (Exception e) {
-				//System.out.println("An error occured while opening the connection.");
-				//System.out.println(e.toString());
+				System.out.println("An error occured while opening the connection.");
+				System.out.println(e);
 				return;
 			}	
 		}
@@ -194,7 +196,7 @@ public class ManagerSocket extends Thread{
 	}*/
 	
 	public Friend getRequestingFriend(String reqIP){
-		Friend toReturn = friendList.searchFriends(reqIP);
+		Friend toReturn = friendList.searchFriendWithIP(reqIP);
 		if(toReturn == null)
 			toReturn = new Friend("unknown", "unknown", reqIP);
 		return toReturn;

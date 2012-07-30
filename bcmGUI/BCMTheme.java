@@ -37,8 +37,7 @@ public class BCMTheme {
 	public static  int MAX_BUZZ_MAGNITUDE = 30;
 	
 	
-	
-	
+	// MESSAGES
 	public static String statusText (int a, String username) {
 		if (a == STATUS_SIGNEDIN) {
 			return ("Signed in as " + username);
@@ -55,6 +54,18 @@ public class BCMTheme {
 	public static String genTp(Friend fr){
 		return (fr.getUsername() + " (" + fr.getIP() + ")");
 	}
+
 	
+	public static String attemptingConnectMessage(Friend fr){
+		return ("Attempting to connect to " + fr.getNickname() + "...");
+	}
+	
+	public static String isTypingMessage(Friend fr) {
+		return (fr.getNickname() + " is typing");
+	}
+	
+	public static String chatMessage(Friend fr, String msg) {
+		return ("\n" + fr.getNickname() + ": " + msg);
+	}
 	
 }
